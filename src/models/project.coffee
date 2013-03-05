@@ -1,0 +1,1 @@
+class KnitCount.Models.Project extends Backbone.Model
