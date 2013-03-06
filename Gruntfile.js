@@ -1,5 +1,7 @@
 
 module.exports = function(grunt) {
+  var defaultTasks = ['handlebars', 'coffeelint', 'coffee', 'concat'];
+
   grunt.initConfig({
     bowerful: {
       store: 'vendor',
@@ -7,7 +9,8 @@ module.exports = function(grunt) {
       packages: {
         'jquery': '~1.8',
         'underscore': '',
-        'backbone': ''
+        'backbone': '',
+        'handlebars': ''
       }
     },
 
@@ -22,6 +25,9 @@ module.exports = function(grunt) {
     },
 
     coffeelint: {
+      options: {
+        max_line_length: { level: 'ignore' }
+      },
       app: ['src/**/*.coffee']
     },
 
@@ -30,16 +36,33 @@ module.exports = function(grunt) {
         src: [
           'public/js/knitcount.js',
           'public/js/router.js',
-          'public/js/models/*.js'
+          'public/js/models/*.js',
+          'public/js/views/*.js',
+          'public/js/templates.js'
         ],
         dest: 'public/js/knitcount.all.js',
       }
     },
 
+    handlebars: {
+      all: {
+        options: {
+          namespace: 'KnitCount.Templates',
+          processName: function(filePath) {
+            var pieces = filePath.split("/");
+            return pieces[pieces.length - 1].replace('.hbs', '');
+          }
+        },
+        files: {
+          "public/js/templates.js": ["src/templates/*.hbs"]
+        }
+      }
+    },
+
     watch: {
-      coffee: {
-        files: '**/*.coffee',
-        tasks: ['coffeelint', 'coffee', 'concat'],
+      all: {
+        files: ['src/**/*.coffee', 'src/templates/*.hbs'],
+        tasks: defaultTasks,
         options: {
           debounceDelay: 250
         }
@@ -52,8 +75,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-coffeelint');
+  grunt.loadNpmTasks('grunt-contrib-handlebars');
 
-  grunt.registerTask('default', ['coffeelint', 'coffee', 'concat']);
+  grunt.registerTask('default', defaultTasks);
 
 
   var growl = require('growl');
