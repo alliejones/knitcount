@@ -1,5 +1,7 @@
 window.KnitCount =
   Models: {}
   Collections: {}
-  Routers: {}
   Views: {}
+
+  init: ->
+    console.log('test')

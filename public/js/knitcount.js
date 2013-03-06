@@ -3,8 +3,10 @@
   window.KnitCount = {
     Models: {},
     Collections: {},
-    Routers: {},
-    Views: {}
+    Views: {},
+    init: function() {
+      return console.log('test');
+    }
   };
 
 }).call(this);
