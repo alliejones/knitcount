@@ -15,7 +15,7 @@ module.exports = function(grunt) {
       compile: {
         cwd: 'src',
         expand: true,
-        src: ['src/**/*.coffee'],
+        src: ['**/*.coffee'],
         dest: 'public/js',
         ext: '.js'
       }
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
     watch: {
       coffee: {
         files: '**/*.coffee',
-        tasks: ['coffee', 'concat'],
+        tasks: ['coffeelint', 'coffee', 'concat'],
         options: {
           debounceDelay: 250
         }
