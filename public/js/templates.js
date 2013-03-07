@@ -28,7 +28,7 @@ helpers = helpers || Handlebars.helpers; data = data || {};
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</h2>\n\n<ul class=\"counters\"></ul>";
+    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"add_counter\">Add Counter</button></p>\n";
   return buffer;
   });
 
@@ -55,6 +55,6 @@ function program1(depth0,data) {
   buffer += "<h2>Projects</h2>\n<ul>\n";
   stack1 = helpers.each.call(depth0, depth0.collection, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>\n\n<label>New Project Name <input type=\"text\" name=\"new_project_name\" value=\"New Project\"></label>\n<button class=\"add_project\">Add Project</button>";
+  buffer += "\n</ul>\n\n<p>\n  <label>New Project Name <input type=\"text\" name=\"new_project_name\" value=\"New Project\"></label>\n  <button class=\"add_project\">Add Project</button>\n</p>\n";
   return buffer;
   });

@@ -28,6 +28,7 @@
       var name;
       name = this.$('input[name="new_project_name"]').val();
       return this.collection.add({
+        id: KnitCount.generateID('projects'),
         name: name
       });
     };

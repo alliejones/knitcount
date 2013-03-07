@@ -16,6 +16,12 @@ window.KnitCount =
 
   getProject: (id) -> @projects.get(id)
 
+  # get an ID temporarily (while there is no database backend)
+  generateID: (allModelsName) ->
+    allModels = KnitCount[allModelsName]
+    return null unless allModels?
+    (allModels.max (m) -> m.id).id + 1
+
 
 class KnitCount.View extends Backbone.View
   initialize: ->

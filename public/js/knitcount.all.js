@@ -17,6 +17,16 @@
     },
     getProject: function(id) {
       return this.projects.get(id);
+    },
+    generateID: function(allModelsName) {
+      var allModels;
+      allModels = KnitCount[allModelsName];
+      if (allModels == null) {
+        return null;
+      }
+      return (allModels.max(function(m) {
+        return m.id;
+      })).id + 1;
     }
   };
 
@@ -205,6 +215,7 @@
     }
 
     Project.prototype.initialize = function() {
+      this.counters = new KnitCount.Collections.Counters;
       return this.updateCounters();
     };
 
@@ -223,7 +234,7 @@
       _.each(counters, function(counter) {
         return counter.project = this;
       });
-      return this.counters = new KnitCount.Collections.Counters(counters);
+      return this.counters.reset(counters);
     };
 
     return Project;
@@ -318,6 +329,8 @@
     function ProjectView() {
       this.render = __bind(this.render, this);
       this.renderCounter = __bind(this.renderCounter, this);
+      this.addCounter = __bind(this.addCounter, this);
+      this.initialize = __bind(this.initialize, this);
       ProjectView.__super__.constructor.apply(this, arguments);
     }
 
@@ -326,13 +339,31 @@
     ProjectView.prototype.templateName = 'project';
 
     ProjectView.prototype.events = {
-      'click .back': 'goToProjectList'
+      'click .back': 'goToProjectList',
+      'click .add_counter': 'addCounter'
+    };
+
+    ProjectView.prototype.initialize = function() {
+      ProjectView.__super__.initialize.apply(this, arguments);
+      this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
+      return this.listenTo(this.model.counters, 'reset', this.render);
     };
 
     ProjectView.prototype.goToProjectList = function() {
       return KnitCount.router.navigate('/', {
         trigger: true
       });
+    };
+
+    ProjectView.prototype.addCounter = function() {
+      var id;
+      id = KnitCount.generateID('counters');
+      return KnitCount.counters.add(new KnitCount.Models.Counter({
+        id: id,
+        name: "Counter " + id,
+        value: 0,
+        project_id: this.model.get('id')
+      }));
     };
 
     ProjectView.prototype.renderCounter = function(counter) {
@@ -345,6 +376,7 @@
 
     ProjectView.prototype.render = function() {
       ProjectView.__super__.render.apply(this, arguments);
+      this.$('.counters').empty();
       this.model.counters.each(this.renderCounter);
       return this;
     };
@@ -385,6 +417,7 @@
       var name;
       name = this.$('input[name="new_project_name"]').val();
       return this.collection.add({
+        id: KnitCount.generateID('projects'),
         name: name
       });
     };
@@ -434,7 +467,7 @@ helpers = helpers || Handlebars.helpers; data = data || {};
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</h2>\n\n<ul class=\"counters\"></ul>";
+    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"add_counter\">Add Counter</button></p>\n";
   return buffer;
   });
 
@@ -461,6 +494,6 @@ function program1(depth0,data) {
   buffer += "<h2>Projects</h2>\n<ul>\n";
   stack1 = helpers.each.call(depth0, depth0.collection, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>\n\n<label>New Project Name <input type=\"text\" name=\"new_project_name\" value=\"New Project\"></label>\n<button class=\"add_project\">Add Project</button>";
+  buffer += "\n</ul>\n\n<p>\n  <label>New Project Name <input type=\"text\" name=\"new_project_name\" value=\"New Project\"></label>\n  <button class=\"add_project\">Add Project</button>\n</p>\n";
   return buffer;
   });

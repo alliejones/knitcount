@@ -10,6 +10,8 @@
     function ProjectView() {
       this.render = __bind(this.render, this);
       this.renderCounter = __bind(this.renderCounter, this);
+      this.addCounter = __bind(this.addCounter, this);
+      this.initialize = __bind(this.initialize, this);
       ProjectView.__super__.constructor.apply(this, arguments);
     }
 
@@ -18,13 +20,31 @@
     ProjectView.prototype.templateName = 'project';
 
     ProjectView.prototype.events = {
-      'click .back': 'goToProjectList'
+      'click .back': 'goToProjectList',
+      'click .add_counter': 'addCounter'
+    };
+
+    ProjectView.prototype.initialize = function() {
+      ProjectView.__super__.initialize.apply(this, arguments);
+      this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
+      return this.listenTo(this.model.counters, 'reset', this.render);
     };
 
     ProjectView.prototype.goToProjectList = function() {
       return KnitCount.router.navigate('/', {
         trigger: true
       });
+    };
+
+    ProjectView.prototype.addCounter = function() {
+      var id;
+      id = KnitCount.generateID('counters');
+      return KnitCount.counters.add(new KnitCount.Models.Counter({
+        id: id,
+        name: "Counter " + id,
+        value: 0,
+        project_id: this.model.get('id')
+      }));
     };
 
     ProjectView.prototype.renderCounter = function(counter) {
@@ -37,6 +57,7 @@
 
     ProjectView.prototype.render = function() {
       ProjectView.__super__.render.apply(this, arguments);
+      this.$('.counters').empty();
       this.model.counters.each(this.renderCounter);
       return this;
     };

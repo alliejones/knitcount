@@ -14,6 +14,7 @@
     }
 
     Project.prototype.initialize = function() {
+      this.counters = new KnitCount.Collections.Counters;
       return this.updateCounters();
     };
 
@@ -32,7 +33,7 @@
       _.each(counters, function(counter) {
         return counter.project = this;
       });
-      return this.counters = new KnitCount.Collections.Counters(counters);
+      return this.counters.reset(counters);
     };
 
     return Project;

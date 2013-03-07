@@ -17,6 +17,16 @@
     },
     getProject: function(id) {
       return this.projects.get(id);
+    },
+    generateID: function(allModelsName) {
+      var allModels;
+      allModels = KnitCount[allModelsName];
+      if (allModels == null) {
+        return null;
+      }
+      return (allModels.max(function(m) {
+        return m.id;
+      })).id + 1;
     }
   };
 
