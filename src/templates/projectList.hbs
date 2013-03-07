@@ -1,7 +1,11 @@
 <h2>Projects</h2>
+
 <ul>
 {{#each collection}}
-  <li class="project"><a href="" data-id="{{id}}">{{name}}</a></li>
+  <li class="project">
+    <a href="" data-id="{{id}}">{{name}}</a>
+    {{#if ../editMode}}<button class="delete_project">Delete</button>{{/if}}
+  </li>
 {{/each}}
 </ul>
 
@@ -9,3 +13,5 @@
   <label>New Project Name <input type="text" name="new_project_name" value="New Project"></label>
   <button class="add_project">Add Project</button>
 </p>
+
+<p><button class="edit">{{#if editMode}}Done Editing{{else}}Edit Projects{{/if}}</button></p>

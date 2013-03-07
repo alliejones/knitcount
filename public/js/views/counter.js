@@ -8,8 +8,11 @@
     __extends(Counter, _super);
 
     function Counter() {
+      this.templateData = __bind(this.templateData, this);
+      this["delete"] = __bind(this["delete"], this);
       this.decrement = __bind(this.decrement, this);
       this.increment = __bind(this.increment, this);
+      this.initialize = __bind(this.initialize, this);
       Counter.__super__.constructor.apply(this, arguments);
     }
 
@@ -19,12 +22,14 @@
 
     Counter.prototype.events = {
       'click .increment': 'increment',
-      'click .decrement': 'decrement'
+      'click .decrement': 'decrement',
+      'click .delete': 'delete'
     };
 
-    Counter.prototype.initialize = function() {
+    Counter.prototype.initialize = function(settings) {
       Counter.__super__.initialize.apply(this, arguments);
-      return this.listenTo(this.model, 'change', this.render);
+      this.listenTo(this.model, 'change', this.render);
+      return this.listenTo(settings.parentView, 'change:editMode', this.render);
     };
 
     Counter.prototype.increment = function() {
@@ -33,6 +38,17 @@
 
     Counter.prototype.decrement = function() {
       return this.model.decrement();
+    };
+
+    Counter.prototype["delete"] = function() {
+      return this.model.collection.remove(this.model);
+    };
+
+    Counter.prototype.templateData = function() {
+      var data;
+      data = this.model.toJSON();
+      data.editMode = this.parentView.editMode;
+      return data;
     };
 
     return Counter;

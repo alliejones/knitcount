@@ -18,6 +18,9 @@
     getProject: function(id) {
       return this.projects.get(id);
     },
+    getCounter: function(id) {
+      return this.counters.get(id);
+    },
     generateID: function(allModelsName) {
       var allModels;
       allModels = KnitCount[allModelsName];
@@ -36,6 +39,7 @@
 
     function View() {
       this.render = __bind(this.render, this);
+      this.templateData = __bind(this.templateData, this);
       View.__super__.constructor.apply(this, arguments);
     }
 
@@ -43,8 +47,12 @@
       return this.template = KnitCount.Templates[this.templateName];
     };
 
+    View.prototype.templateData = function() {
+      return this.model.toJSON();
+    };
+
     View.prototype.render = function() {
-      this.$el.html(this.template(this.model.toJSON()));
+      this.$el.html(this.template(this.templateData()));
       return this;
     };
 
@@ -57,7 +65,7 @@
     __extends(CollectionView, _super);
 
     function CollectionView() {
-      this.render = __bind(this.render, this);
+      this.templateData = __bind(this.templateData, this);
       CollectionView.__super__.constructor.apply(this, arguments);
     }
 
@@ -67,11 +75,10 @@
       return this.listenTo(this.collection, 'remove', this.render);
     };
 
-    CollectionView.prototype.render = function() {
-      this.$el.html(this.template({
+    CollectionView.prototype.templateData = function() {
+      return {
         collection: this.collection.toJSON()
-      }));
-      return this;
+      };
     };
 
     return CollectionView;

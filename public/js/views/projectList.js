@@ -8,7 +8,10 @@
     __extends(ProjectListView, _super);
 
     function ProjectListView() {
+      this.templateData = __bind(this.templateData, this);
       this.goToProject = __bind(this.goToProject, this);
+      this.toggleEditMode = __bind(this.toggleEditMode, this);
+      this.deleteProject = __bind(this.deleteProject, this);
       this.addProject = __bind(this.addProject, this);
       ProjectListView.__super__.constructor.apply(this, arguments);
     }
@@ -21,7 +24,15 @@
 
     ProjectListView.prototype.events = {
       'click .add_project': 'addProject',
-      'click .project a': 'goToProject'
+      'click .project a': 'goToProject',
+      'click .edit': 'toggleEditMode',
+      'click .delete_project': 'deleteProject'
+    };
+
+    ProjectListView.prototype.initialize = function() {
+      ProjectListView.__super__.initialize.apply(this, arguments);
+      this.editMode = false;
+      return this.on('change:editMode', this.render);
     };
 
     ProjectListView.prototype.addProject = function() {
@@ -33,6 +44,17 @@
       });
     };
 
+    ProjectListView.prototype.deleteProject = function(e) {
+      var id;
+      id = $(e.target).prev('a').data('id');
+      return KnitCount.projects.remove(KnitCount.getProject(id));
+    };
+
+    ProjectListView.prototype.toggleEditMode = function() {
+      this.editMode = !this.editMode;
+      return this.trigger('change:editMode');
+    };
+
     ProjectListView.prototype.goToProject = function(e) {
       var projectID;
       projectID = $(e.target).data('id');
@@ -40,6 +62,13 @@
         trigger: true
       });
       return e.preventDefault();
+    };
+
+    ProjectListView.prototype.templateData = function() {
+      return {
+        collection: this.collection.toJSON(),
+        editMode: this.editMode
+      };
     };
 
     return ProjectListView;

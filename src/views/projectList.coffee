@@ -6,6 +6,13 @@ class KnitCount.Views.ProjectListView extends KnitCount.CollectionView
   events:
     'click .add_project': 'addProject'
     'click .project a': 'goToProject'
+    'click .edit': 'toggleEditMode'
+    'click .delete_project': 'deleteProject'
+
+  initialize: ->
+    super
+    @editMode = false
+    @on 'change:editMode', @render
 
   addProject: =>
     name = this.$('input[name="new_project_name"]').val()
@@ -14,7 +21,17 @@ class KnitCount.Views.ProjectListView extends KnitCount.CollectionView
       name: name
     )
 
+  deleteProject: (e) =>
+    id = $(e.target).prev('a').data('id')
+    KnitCount.projects.remove KnitCount.getProject(id)
+
+  toggleEditMode: =>
+    @editMode = !@editMode
+    @trigger 'change:editMode'
+
   goToProject: (e) =>
     projectID = $(e.target).data('id')
     KnitCount.router.navigate("project/#{projectID}", trigger: true)
     e.preventDefault()
+
+  templateData: => { collection: @collection.toJSON(), editMode: @editMode }

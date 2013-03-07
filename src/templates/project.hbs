@@ -1,7 +1,9 @@
 <a href="#" class="back">Back to project list</a>
 
-<h2>{{name}}</h2>
+<h2>{{project.name}}</h2>
 
 <ul class="counters"></ul>
 
 <p><button class="add_counter">Add Counter</button></p>
+
+<p><button class="edit">{{#if editMode}}Done Editing{{else}}Edit Counters{{/if}}</button></p>

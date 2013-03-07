@@ -18,6 +18,9 @@
     getProject: function(id) {
       return this.projects.get(id);
     },
+    getCounter: function(id) {
+      return this.counters.get(id);
+    },
     generateID: function(allModelsName) {
       var allModels;
       allModels = KnitCount[allModelsName];
@@ -36,6 +39,7 @@
 
     function View() {
       this.render = __bind(this.render, this);
+      this.templateData = __bind(this.templateData, this);
       View.__super__.constructor.apply(this, arguments);
     }
 
@@ -43,8 +47,12 @@
       return this.template = KnitCount.Templates[this.templateName];
     };
 
+    View.prototype.templateData = function() {
+      return this.model.toJSON();
+    };
+
     View.prototype.render = function() {
-      this.$el.html(this.template(this.model.toJSON()));
+      this.$el.html(this.template(this.templateData()));
       return this;
     };
 
@@ -57,7 +65,7 @@
     __extends(CollectionView, _super);
 
     function CollectionView() {
-      this.render = __bind(this.render, this);
+      this.templateData = __bind(this.templateData, this);
       CollectionView.__super__.constructor.apply(this, arguments);
     }
 
@@ -67,11 +75,10 @@
       return this.listenTo(this.collection, 'remove', this.render);
     };
 
-    CollectionView.prototype.render = function() {
-      this.$el.html(this.template({
+    CollectionView.prototype.templateData = function() {
+      return {
         collection: this.collection.toJSON()
-      }));
-      return this;
+      };
     };
 
     return CollectionView;
@@ -284,8 +291,11 @@
     __extends(Counter, _super);
 
     function Counter() {
+      this.templateData = __bind(this.templateData, this);
+      this["delete"] = __bind(this["delete"], this);
       this.decrement = __bind(this.decrement, this);
       this.increment = __bind(this.increment, this);
+      this.initialize = __bind(this.initialize, this);
       Counter.__super__.constructor.apply(this, arguments);
     }
 
@@ -295,12 +305,14 @@
 
     Counter.prototype.events = {
       'click .increment': 'increment',
-      'click .decrement': 'decrement'
+      'click .decrement': 'decrement',
+      'click .delete': 'delete'
     };
 
-    Counter.prototype.initialize = function() {
+    Counter.prototype.initialize = function(settings) {
       Counter.__super__.initialize.apply(this, arguments);
-      return this.listenTo(this.model, 'change', this.render);
+      this.listenTo(this.model, 'change', this.render);
+      return this.listenTo(settings.parentView, 'change:editMode', this.render);
     };
 
     Counter.prototype.increment = function() {
@@ -309,6 +321,17 @@
 
     Counter.prototype.decrement = function() {
       return this.model.decrement();
+    };
+
+    Counter.prototype["delete"] = function() {
+      return this.model.collection.remove(this.model);
+    };
+
+    Counter.prototype.templateData = function() {
+      var data;
+      data = this.model.toJSON();
+      data.editMode = this.parentView.editMode;
+      return data;
     };
 
     return Counter;
@@ -327,8 +350,11 @@
     __extends(ProjectView, _super);
 
     function ProjectView() {
+      this.templateData = __bind(this.templateData, this);
       this.render = __bind(this.render, this);
       this.renderCounter = __bind(this.renderCounter, this);
+      this.toggleEditMode = __bind(this.toggleEditMode, this);
+      this.deleteCounter = __bind(this.deleteCounter, this);
       this.addCounter = __bind(this.addCounter, this);
       this.initialize = __bind(this.initialize, this);
       ProjectView.__super__.constructor.apply(this, arguments);
@@ -340,13 +366,17 @@
 
     ProjectView.prototype.events = {
       'click .back': 'goToProjectList',
-      'click .add_counter': 'addCounter'
+      'click .add_counter': 'addCounter',
+      'click .edit': 'toggleEditMode'
     };
 
     ProjectView.prototype.initialize = function() {
       ProjectView.__super__.initialize.apply(this, arguments);
+      this.editMode = false;
       this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
-      return this.listenTo(this.model.counters, 'reset', this.render);
+      this.listenTo(KnitCount.counters, 'remove', this.model.updateCounters);
+      this.listenTo(this.model.counters, 'reset', this.render);
+      return this.on('change:editMode', this.render);
     };
 
     ProjectView.prototype.goToProjectList = function() {
@@ -366,19 +396,42 @@
       }));
     };
 
+    ProjectView.prototype.deleteCounter = function(e) {
+      var id;
+      id = $(e.target).prev('a').data('id');
+      return KnitCount.projects.remove(KnitCount.getCounter(id));
+    };
+
+    ProjectView.prototype.toggleEditMode = function() {
+      this.editMode = !this.editMode;
+      return this.trigger('change:editMode');
+    };
+
     ProjectView.prototype.renderCounter = function(counter) {
       var view;
       view = new KnitCount.Views.Counter({
-        model: counter
+        model: counter,
+        parentView: this
       });
+      view.parentView = this;
       return this.$('.counters').append(view.render().el);
     };
 
     ProjectView.prototype.render = function() {
+      var _this = this;
       ProjectView.__super__.render.apply(this, arguments);
       this.$('.counters').empty();
-      this.model.counters.each(this.renderCounter);
+      this.model.counters.each(function(counter) {
+        return _this.renderCounter(counter);
+      });
       return this;
+    };
+
+    ProjectView.prototype.templateData = function() {
+      return {
+        project: this.model.toJSON(),
+        editMode: this.editMode
+      };
     };
 
     return ProjectView;
@@ -397,7 +450,10 @@
     __extends(ProjectListView, _super);
 
     function ProjectListView() {
+      this.templateData = __bind(this.templateData, this);
       this.goToProject = __bind(this.goToProject, this);
+      this.toggleEditMode = __bind(this.toggleEditMode, this);
+      this.deleteProject = __bind(this.deleteProject, this);
       this.addProject = __bind(this.addProject, this);
       ProjectListView.__super__.constructor.apply(this, arguments);
     }
@@ -410,7 +466,15 @@
 
     ProjectListView.prototype.events = {
       'click .add_project': 'addProject',
-      'click .project a': 'goToProject'
+      'click .project a': 'goToProject',
+      'click .edit': 'toggleEditMode',
+      'click .delete_project': 'deleteProject'
+    };
+
+    ProjectListView.prototype.initialize = function() {
+      ProjectListView.__super__.initialize.apply(this, arguments);
+      this.editMode = false;
+      return this.on('change:editMode', this.render);
     };
 
     ProjectListView.prototype.addProject = function() {
@@ -422,6 +486,17 @@
       });
     };
 
+    ProjectListView.prototype.deleteProject = function(e) {
+      var id;
+      id = $(e.target).prev('a').data('id');
+      return KnitCount.projects.remove(KnitCount.getProject(id));
+    };
+
+    ProjectListView.prototype.toggleEditMode = function() {
+      this.editMode = !this.editMode;
+      return this.trigger('change:editMode');
+    };
+
     ProjectListView.prototype.goToProject = function(e) {
       var projectID;
       projectID = $(e.target).data('id');
@@ -429,6 +504,13 @@
         trigger: true
       });
       return e.preventDefault();
+    };
+
+    ProjectListView.prototype.templateData = function() {
+      return {
+        collection: this.collection.toJSON(),
+        editMode: this.editMode
+      };
     };
 
     return ProjectListView;
@@ -443,8 +525,13 @@ this["KnitCount"]["Templates"] = this["KnitCount"]["Templates"] || {};
 this["KnitCount"]["Templates"]["counter"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
+  
+  
+  return "\n  <button class=\"decrement\">subtract</button>\n  <button class=\"delete\">delete</button>\n";
+  }
 
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
@@ -453,21 +540,35 @@ helpers = helpers || Handlebars.helpers; data = data || {};
   if (stack1 = helpers.value) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.value; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + " <button class=\"increment\">add</button> <button class=\"decrement\">-</button>";
+    + " <button class=\"increment\">add</button>\n";
+  stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
   return buffer;
   });
 
 this["KnitCount"]["Templates"]["project"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, stack2, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
+  
+  
+  return "Done Editing";
+  }
 
-  buffer += "<a href=\"#\" class=\"back\">Back to project list</a>\n\n<h2>";
-  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"add_counter\">Add Counter</button></p>\n";
+function program3(depth0,data) {
+  
+  
+  return "Edit Counters";
+  }
+
+  buffer += "<a href=\"#\" class=\"back\">Back to project list</a>\n\n<h2>"
+    + escapeExpression(((stack1 = ((stack1 = depth0.project),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"add_counter\">Add Counter</button></p>\n\n<p><button class=\"edit\">";
+  stack2 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
+  if(stack2 || stack2 === 0) { buffer += stack2; }
+  buffer += "</button></p>\n";
   return buffer;
   });
 
@@ -476,10 +577,10 @@ this["KnitCount"]["Templates"]["projectList"] = Handlebars.template(function (Ha
 helpers = helpers || Handlebars.helpers; data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
-function program1(depth0,data) {
+function program1(depth0,data,depth1) {
   
   var buffer = "", stack1;
-  buffer += "\n  <li class=\"project\"><a href=\"\" data-id=\"";
+  buffer += "\n  <li class=\"project\">\n    <a href=\"\" data-id=\"";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
@@ -487,13 +588,36 @@ function program1(depth0,data) {
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</a></li>\n";
+    + "</a>\n    ";
+  stack1 = helpers['if'].call(depth0, depth1.editMode, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n  </li>\n";
   return buffer;
   }
+function program2(depth0,data) {
+  
+  
+  return "<button class=\"delete_project\">Delete</button>";
+  }
 
-  buffer += "<h2>Projects</h2>\n<ul>\n";
-  stack1 = helpers.each.call(depth0, depth0.collection, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+function program4(depth0,data) {
+  
+  
+  return "Done Editing";
+  }
+
+function program6(depth0,data) {
+  
+  
+  return "Edit Projects";
+  }
+
+  buffer += "<h2>Projects</h2>\n\n<ul>\n";
+  stack1 = helpers.each.call(depth0, depth0.collection, {hash:{},inverse:self.noop,fn:self.programWithDepth(program1, data, depth0),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>\n\n<p>\n  <label>New Project Name <input type=\"text\" name=\"new_project_name\" value=\"New Project\"></label>\n  <button class=\"add_project\">Add Project</button>\n</p>\n";
+  buffer += "\n</ul>\n\n<p>\n  <label>New Project Name <input type=\"text\" name=\"new_project_name\" value=\"New Project\"></label>\n  <button class=\"add_project\">Add Project</button>\n</p>\n\n<p><button class=\"edit\">";
+  stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</button></p>\n";
   return buffer;
   });

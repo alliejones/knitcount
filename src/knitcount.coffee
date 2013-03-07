@@ -15,6 +15,7 @@ window.KnitCount =
 
 
   getProject: (id) -> @projects.get(id)
+  getCounter: (id) -> @counters.get(id)
 
   # get an ID temporarily (while there is no database backend)
   generateID: (allModelsName) ->
@@ -27,8 +28,10 @@ class KnitCount.View extends Backbone.View
   initialize: ->
     @template = KnitCount.Templates[@templateName]
 
+  templateData: => @model.toJSON()
+
   render: =>
-    this.$el.html @template(@model.toJSON())
+    this.$el.html @template(@templateData())
     this
 
 
@@ -38,6 +41,4 @@ class KnitCount.CollectionView extends KnitCount.View
     @listenTo @collection, 'add', @render
     @listenTo @collection, 'remove', @render
 
-  render: =>
-    this.$el.html @template({ collection: @collection.toJSON() })
-    this
+  templateData: => { collection: @collection.toJSON() }
