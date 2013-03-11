@@ -3,7 +3,7 @@ class KnitCount.Models.Counter extends Backbone.Model
     newValue = @get('value') + 1
     maxValue = @get 'max_value'
     if maxValue? and newValue > maxValue
-      @set 'value', 0
+      @set 'value', 1
       @trigger 'counter:rollover'
     else
       @set 'value', newValue

@@ -149,7 +149,7 @@
       newValue = this.get('value') + 1;
       maxValue = this.get('max_value');
       if ((maxValue != null) && newValue > maxValue) {
-        this.set('value', 0);
+        this.set('value', 1);
         return this.trigger('counter:rollover');
       } else {
         return this.set('value', newValue);
