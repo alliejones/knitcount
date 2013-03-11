@@ -109,7 +109,6 @@
         model: counter,
         parentView: this
       });
-      view.parentView = this;
       return this.$('.counters').append(view.render().el);
     };
 

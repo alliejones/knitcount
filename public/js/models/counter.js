@@ -19,7 +19,7 @@
       maxValue = this.get('max_value');
       if ((maxValue != null) && newValue > maxValue) {
         this.set('value', 0);
-        return this.trigger('counter:reset');
+        return this.trigger('counter:rollover');
       } else {
         return this.set('value', newValue);
       }

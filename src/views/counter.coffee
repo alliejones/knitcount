@@ -10,7 +10,7 @@ class KnitCount.Views.Counter extends KnitCount.View
   initialize: (settings) =>
     super
     @listenTo @model, 'change', @render
-    @listenTo settings.parentView, 'change:editMode', @render
+    @listenTo @parentView, 'change:editMode', @render
 
   increment: => @model.increment()
 

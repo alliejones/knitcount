@@ -43,8 +43,11 @@
       View.__super__.constructor.apply(this, arguments);
     }
 
-    View.prototype.initialize = function() {
-      return this.template = KnitCount.Templates[this.templateName];
+    View.prototype.initialize = function(settings) {
+      this.template = KnitCount.Templates[this.templateName];
+      if (settings.parentView != null) {
+        return this.parentView = settings.parentView;
+      }
     };
 
     View.prototype.templateData = function() {
@@ -147,7 +150,7 @@
       maxValue = this.get('max_value');
       if ((maxValue != null) && newValue > maxValue) {
         this.set('value', 0);
-        return this.trigger('counter:reset');
+        return this.trigger('counter:rollover');
       } else {
         return this.set('value', newValue);
       }
@@ -325,7 +328,7 @@
     Counter.prototype.initialize = function(settings) {
       Counter.__super__.initialize.apply(this, arguments);
       this.listenTo(this.model, 'change', this.render);
-      return this.listenTo(settings.parentView, 'change:editMode', this.render);
+      return this.listenTo(this.parentView, 'change:editMode', this.render);
     };
 
     Counter.prototype.increment = function() {
@@ -464,7 +467,6 @@
         model: counter,
         parentView: this
       });
-      view.parentView = this;
       return this.$('.counters').append(view.render().el);
     };
 
@@ -615,7 +617,7 @@ function program3(depth0,data) {
     + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"show_add_counter\">Add Counter</button></p>\n\n<p><button class=\"edit\">";
   stack2 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "</button></p>\n\n<div id=\"add_counter_options\" class=\"hidden\">\n  <h3>Add a counter</h3>\n  <p>\n    <label for=\"name\">Name</label>\n    <input type=\"text\" name=\"name\">\n  </p>\n  <p>\n    <label for=\"use_max_value\">\n      <input type=\"checkbox\" name=\"use_max_value\"> Set a maximum counter value\n    </label>\n  </p>\n  <p id=\"max_value_input\" class=\"hidden\">\n    <label for=\"max_value\">Maximum counter value</label>\n    <input type=\"number\" name=\"max_value\" pattern=\"[0-9]*\">\n  </p>\n  <button class=\"add_counter\">Add counter</button>\n  <button class=\"add_counter_cancel\">Cancel</button>\n</div>\n";
+  buffer += "</button></p>\n\n<div id=\"add_counter_options\" class=\"hidden\">\n  <h3>Add a counter</h3>\n  <p>\n    <label for=\"name\">Name</label>\n    <input type=\"text\" name=\"name\">\n  </p>\n  <p>\n    <label>\n      <input type=\"checkbox\" name=\"use_max_value\"> Set a maximum counter value\n    </label>\n  </p>\n  <p id=\"max_value_input\" class=\"hidden\">\n    <label for=\"max_value\">Maximum counter value</label>\n    <input type=\"number\" name=\"max_value\" pattern=\"[0-9]*\">\n  </p>\n  <button class=\"add_counter\">Add counter</button>\n  <button class=\"add_counter_cancel\">Cancel</button>\n</div>\n";
   return buffer;
   });
 

@@ -61,7 +61,6 @@ class KnitCount.Views.ProjectView extends KnitCount.View
 
   renderCounter: (counter) =>
     view = new KnitCount.Views.Counter( model: counter, parentView: this )
-    view.parentView = this
     this.$('.counters').append view.render().el
 
   render: =>

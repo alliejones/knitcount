@@ -25,8 +25,9 @@ window.KnitCount =
 
 
 class KnitCount.View extends Backbone.View
-  initialize: ->
+  initialize: (settings) ->
     @template = KnitCount.Templates[@templateName]
+    @parentView = settings.parentView if settings.parentView?
 
   templateData: => @model.toJSON()
 

@@ -43,8 +43,11 @@
       View.__super__.constructor.apply(this, arguments);
     }
 
-    View.prototype.initialize = function() {
-      return this.template = KnitCount.Templates[this.templateName];
+    View.prototype.initialize = function(settings) {
+      this.template = KnitCount.Templates[this.templateName];
+      if (settings.parentView != null) {
+        return this.parentView = settings.parentView;
+      }
     };
 
     View.prototype.templateData = function() {

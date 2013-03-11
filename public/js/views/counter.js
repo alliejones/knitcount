@@ -29,7 +29,7 @@
     Counter.prototype.initialize = function(settings) {
       Counter.__super__.initialize.apply(this, arguments);
       this.listenTo(this.model, 'change', this.render);
-      return this.listenTo(settings.parentView, 'change:editMode', this.render);
+      return this.listenTo(this.parentView, 'change:editMode', this.render);
     };
 
     Counter.prototype.increment = function() {
