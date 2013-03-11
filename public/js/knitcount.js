@@ -33,6 +33,10 @@
     }
   };
 
+  KnitCount.dispatcher = {};
+
+  _.extend(KnitCount.dispatcher, Backbone.Events);
+
   KnitCount.View = (function(_super) {
 
     __extends(View, _super);

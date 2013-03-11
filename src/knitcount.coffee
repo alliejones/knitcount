@@ -24,6 +24,10 @@ window.KnitCount =
     (allModels.max (m) -> m.id).id + 1
 
 
+KnitCount.dispatcher = {}
+_.extend(KnitCount.dispatcher, Backbone.Events)
+
+
 class KnitCount.View extends Backbone.View
   initialize: (settings) ->
     @template = KnitCount.Templates[@templateName]

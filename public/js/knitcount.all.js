@@ -33,6 +33,10 @@
     }
   };
 
+  KnitCount.dispatcher = {};
+
+  _.extend(KnitCount.dispatcher, Backbone.Events);
+
   KnitCount.View = (function(_super) {
 
     __extends(View, _super);
@@ -126,11 +130,11 @@
       return $('#container').html(view.el);
     };
 
-    Router.prototype.createCounter = function(id) {
+    Router.prototype.createCounter = function(projectId) {
       var view;
       view = new KnitCount.Views.CreateCounterView({
         model: new KnitCount.Models.Counter({
-          project_id: +id
+          project_id: +projectId
         })
       }).render();
       return $('#container').html(view.el);
@@ -152,10 +156,17 @@
     __extends(Counter, _super);
 
     function Counter() {
+      this.linkedCounterUpdate = __bind(this.linkedCounterUpdate, this);
       this.decrement = __bind(this.decrement, this);
       this.increment = __bind(this.increment, this);
+      this.initialize = __bind(this.initialize, this);
       Counter.__super__.constructor.apply(this, arguments);
     }
+
+    Counter.prototype.initialize = function() {
+      Counter.__super__.initialize.apply(this, arguments);
+      return this.listenTo(KnitCount.dispatcher, 'counter:rollover', this.linkedCounterUpdate);
+    };
 
     Counter.prototype.increment = function() {
       var maxValue, newValue;
@@ -163,7 +174,7 @@
       maxValue = this.get('max_value');
       if ((maxValue != null) && newValue > maxValue) {
         this.set('value', 1);
-        return this.trigger('counter:rollover');
+        return KnitCount.dispatcher.trigger('counter:rollover', this);
       } else {
         return this.set('value', newValue);
       }
@@ -174,6 +185,12 @@
       value = this.get('value') - 1;
       if (value >= 0) {
         return this.set('value', value);
+      }
+    };
+
+    Counter.prototype.linkedCounterUpdate = function(updatedCounter) {
+      if ((this.get('linked_counter_id') != null) && this.get('linked_counter_id') === updatedCounter.get('id')) {
+        return this.increment();
       }
     };
 
@@ -199,31 +216,43 @@
             name: 'Counter One',
             value: 6,
             project_id: 1,
-            max_value: 10
+            max_value: 10,
+            linked_counter_id: null
           }, {
             id: 2,
             name: 'Counter Two',
             value: 0,
             project_id: 1,
-            max_value: null
+            max_value: 3,
+            linked_counter_id: null
           }, {
             id: 3,
             name: 'Counter Three',
             value: 0,
             project_id: 2,
-            max_value: null
+            max_value: null,
+            linked_counter_id: null
           }, {
             id: 4,
             name: 'Counter Four',
             value: 1,
             project_id: 3,
-            max_value: null
+            max_value: null,
+            linked_counter_id: null
           }, {
             id: 5,
-            name: 'Counter Five',
-            value: 32,
+            name: 'Linked to One',
+            value: 2,
             project_id: 1,
-            max_value: null
+            max_value: null,
+            linked_counter_id: 1
+          }, {
+            id: 6,
+            name: 'Linked to Two',
+            value: 2,
+            project_id: 1,
+            max_value: 2,
+            linked_counter_id: 2
           }
         ]);
       }
@@ -719,12 +748,27 @@ this["KnitCount"]["Templates"] = this["KnitCount"]["Templates"] || {};
 this["KnitCount"]["Templates"]["counter"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  var buffer = "", stack1, self=this, functionType="function", escapeExpression=this.escapeExpression;
 
 function program1(depth0,data) {
   
   
-  return "\n  <button class=\"decrement\">subtract</button>\n  <button class=\"delete\">delete</button>\n";
+  return "\n<button class=\"increment\">add</button>\n";
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n  ";
+  stack1 = helpers['if'].call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n  <button class=\"decrement\">subtract</button>\n  <button class=\"delete\">delete</button>\n";
+  return buffer;
+  }
+function program4(depth0,data) {
+  
+  
+  return "\n    <button class=\"increment\">add</button>\n  ";
   }
 
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -734,8 +778,11 @@ function program1(depth0,data) {
   if (stack1 = helpers.value) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.value; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + " <button class=\"increment\">add</button>\n";
-  stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+    + "\n";
+  stack1 = helpers.unless.call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n";
+  stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   return buffer;
   });

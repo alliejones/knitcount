@@ -34,11 +34,11 @@
       return $('#container').html(view.el);
     };
 
-    Router.prototype.createCounter = function(id) {
+    Router.prototype.createCounter = function(projectId) {
       var view;
       view = new KnitCount.Views.CreateCounterView({
         model: new KnitCount.Models.Counter({
-          project_id: +id
+          project_id: +projectId
         })
       }).render();
       return $('#container').html(view.el);

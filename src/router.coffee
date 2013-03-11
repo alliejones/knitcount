@@ -14,8 +14,8 @@ class KnitCount.Router extends Backbone.Router
     view = new KnitCount.Views.ProjectView({ model: model }).render()
     $('#container').html view.el
 
-  createCounter: (id) ->
+  createCounter: (projectId) ->
     view = new KnitCount.Views.CreateCounterView(
-      model: new KnitCount.Models.Counter(project_id: +id)
+      model: new KnitCount.Models.Counter(project_id: +projectId)
     ).render()
     $('#container').html view.el

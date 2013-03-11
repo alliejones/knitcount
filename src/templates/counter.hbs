@@ -1,5 +1,11 @@
-{{name}}: {{value}} <button class="increment">add</button>
+{{name}}: {{value}}
+{{#unless linked_counter_id}}
+<button class="increment">add</button>
+{{/unless}}
 {{#if editMode}}
+  {{#if linked_counter_id}}
+    <button class="increment">add</button>
+  {{/if}}
   <button class="decrement">subtract</button>
   <button class="delete">delete</button>
 {{/if}}
