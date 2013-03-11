@@ -4,11 +4,8 @@ class KnitCount.Views.ProjectView extends KnitCount.View
 
   events:
     'click .back': 'goToProjectList'
-    'click .show_add_counter': 'showAddCounterOptions'
-    'click .add_counter': 'addCounter'
-    'click .add_counter_cancel': 'hideAddCounterOptions'
+    'click .show_add_counter': 'goToAddCounter'
     'click .edit': 'toggleEditMode'
-    'change input[name="use_max_value"]': 'toggleUseMaxValue'
 
   initialize: =>
     super
@@ -22,19 +19,7 @@ class KnitCount.Views.ProjectView extends KnitCount.View
     @on 'change:editMode', @render
 
   goToProjectList: -> KnitCount.router.navigate('/', trigger: true)
-
-  addCounter: =>
-    id = KnitCount.generateID('counters')
-    maxValue = this.$('input[name="max_value"]').val()
-    name = this.$('input[name="name"]').val()
-    KnitCount.counters.add new KnitCount.Models.Counter(
-      id: id
-      name: name
-      value: 0
-      max_value: maxValue
-      project_id: @model.get('id')
-    )
-    @hideAddCounterOptions()
+  goToAddCounter: -> KnitCount.router.navigate("project/#{@model.get 'id'}/new", trigger: true)
 
   deleteCounter: (e) =>
     id = $(e.target).prev('a').data('id')
@@ -43,17 +28,6 @@ class KnitCount.Views.ProjectView extends KnitCount.View
   toggleEditMode: =>
     @editMode = !@editMode
     @trigger 'change:editMode'
-
-  showAddCounterOptions: => this.$('#add_counter_options').removeClass('hidden')
-  hideAddCounterOptions: => this.$('#add_counter_options').addClass('hidden')
-
-  toggleUseMaxValue: (e) =>
-    cb = $(e.target)
-    input = this.$('#max_value_input')
-    if cb.is ':checked'
-      input.removeClass 'hidden'
-    else
-      input.addClass 'hidden'
 
   renderCounters: =>
     this.$('.counters').empty()

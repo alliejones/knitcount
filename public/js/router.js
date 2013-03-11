@@ -12,7 +12,8 @@
 
     Router.prototype.routes = {
       "": "projectList",
-      "project/:id": "project"
+      "project/:id": "project",
+      "project/:id/new": "createCounter"
     };
 
     Router.prototype.projectList = function() {
@@ -24,9 +25,21 @@
     };
 
     Router.prototype.project = function(id) {
-      var view;
+      var model, view;
+      model = KnitCount.getProject(id);
+      model.updateCounters();
       view = new KnitCount.Views.ProjectView({
-        model: KnitCount.getProject(id)
+        model: model
+      }).render();
+      return $('#container').html(view.el);
+    };
+
+    Router.prototype.createCounter = function(id) {
+      var view;
+      view = new KnitCount.Views.CreateCounterView({
+        model: new KnitCount.Models.Counter({
+          project_id: +id
+        })
       }).render();
       return $('#container').html(view.el);
     };
