@@ -142,7 +142,15 @@
     }
 
     Counter.prototype.increment = function() {
-      return this.set('value', this.get('value') + 1);
+      var maxValue, newValue;
+      newValue = this.get('value') + 1;
+      maxValue = this.get('max_value');
+      if ((maxValue != null) && newValue > maxValue) {
+        this.set('value', 0);
+        return this.trigger('counter:reset');
+      } else {
+        return this.set('value', newValue);
+      }
     };
 
     Counter.prototype.decrement = function() {
@@ -174,27 +182,32 @@
             id: 1,
             name: 'Counter One',
             value: 6,
-            project_id: 1
+            project_id: 1,
+            max_value: 10
           }, {
             id: 2,
             name: 'Counter Two',
             value: 0,
-            project_id: 1
+            project_id: 1,
+            max_value: null
           }, {
             id: 3,
             name: 'Counter Three',
             value: 0,
-            project_id: 2
+            project_id: 2,
+            max_value: null
           }, {
             id: 4,
             name: 'Counter Four',
             value: 1,
-            project_id: 3
+            project_id: 3,
+            max_value: null
           }, {
             id: 5,
             name: 'Counter Five',
             value: 32,
-            project_id: 1
+            project_id: 1,
+            max_value: null
           }
         ]);
       }
@@ -353,6 +366,10 @@
       this.templateData = __bind(this.templateData, this);
       this.render = __bind(this.render, this);
       this.renderCounter = __bind(this.renderCounter, this);
+      this.renderCounters = __bind(this.renderCounters, this);
+      this.toggleUseMaxValue = __bind(this.toggleUseMaxValue, this);
+      this.hideAddCounterOptions = __bind(this.hideAddCounterOptions, this);
+      this.showAddCounterOptions = __bind(this.showAddCounterOptions, this);
       this.toggleEditMode = __bind(this.toggleEditMode, this);
       this.deleteCounter = __bind(this.deleteCounter, this);
       this.addCounter = __bind(this.addCounter, this);
@@ -366,8 +383,11 @@
 
     ProjectView.prototype.events = {
       'click .back': 'goToProjectList',
+      'click .show_add_counter': 'showAddCounterOptions',
       'click .add_counter': 'addCounter',
-      'click .edit': 'toggleEditMode'
+      'click .add_counter_cancel': 'hideAddCounterOptions',
+      'click .edit': 'toggleEditMode',
+      'change input[name="use_max_value"]': 'toggleUseMaxValue'
     };
 
     ProjectView.prototype.initialize = function() {
@@ -375,7 +395,7 @@
       this.editMode = false;
       this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
       this.listenTo(KnitCount.counters, 'remove', this.model.updateCounters);
-      this.listenTo(this.model.counters, 'reset', this.render);
+      this.listenTo(this.model.counters, 'reset', this.renderCounters);
       return this.on('change:editMode', this.render);
     };
 
@@ -386,14 +406,18 @@
     };
 
     ProjectView.prototype.addCounter = function() {
-      var id;
+      var id, maxValue, name;
       id = KnitCount.generateID('counters');
-      return KnitCount.counters.add(new KnitCount.Models.Counter({
+      maxValue = this.$('input[name="max_value"]').val();
+      name = this.$('input[name="name"]').val();
+      KnitCount.counters.add(new KnitCount.Models.Counter({
         id: id,
-        name: "Counter " + id,
+        name: name,
         value: 0,
+        max_value: maxValue,
         project_id: this.model.get('id')
       }));
+      return this.hideAddCounterOptions();
     };
 
     ProjectView.prototype.deleteCounter = function(e) {
@@ -407,6 +431,33 @@
       return this.trigger('change:editMode');
     };
 
+    ProjectView.prototype.showAddCounterOptions = function() {
+      return this.$('#add_counter_options').removeClass('hidden');
+    };
+
+    ProjectView.prototype.hideAddCounterOptions = function() {
+      return this.$('#add_counter_options').addClass('hidden');
+    };
+
+    ProjectView.prototype.toggleUseMaxValue = function(e) {
+      var cb, input;
+      cb = $(e.target);
+      input = this.$('#max_value_input');
+      if (cb.is(':checked')) {
+        return input.removeClass('hidden');
+      } else {
+        return input.addClass('hidden');
+      }
+    };
+
+    ProjectView.prototype.renderCounters = function() {
+      var _this = this;
+      this.$('.counters').empty();
+      return this.model.counters.each(function(counter) {
+        return _this.renderCounter(counter);
+      });
+    };
+
     ProjectView.prototype.renderCounter = function(counter) {
       var view;
       view = new KnitCount.Views.Counter({
@@ -418,12 +469,8 @@
     };
 
     ProjectView.prototype.render = function() {
-      var _this = this;
       ProjectView.__super__.render.apply(this, arguments);
-      this.$('.counters').empty();
-      this.model.counters.each(function(counter) {
-        return _this.renderCounter(counter);
-      });
+      this.renderCounters();
       return this;
     };
 
@@ -565,10 +612,10 @@ function program3(depth0,data) {
 
   buffer += "<a href=\"#\" class=\"back\">Back to project list</a>\n\n<h2>"
     + escapeExpression(((stack1 = ((stack1 = depth0.project),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"add_counter\">Add Counter</button></p>\n\n<p><button class=\"edit\">";
+    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"show_add_counter\">Add Counter</button></p>\n\n<p><button class=\"edit\">";
   stack2 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "</button></p>\n";
+  buffer += "</button></p>\n\n<div id=\"add_counter_options\" class=\"hidden\">\n  <h3>Add a counter</h3>\n  <p>\n    <label for=\"name\">Name</label>\n    <input type=\"text\" name=\"name\">\n  </p>\n  <p>\n    <label for=\"use_max_value\">\n      <input type=\"checkbox\" name=\"use_max_value\"> Set a maximum counter value\n    </label>\n  </p>\n  <p id=\"max_value_input\" class=\"hidden\">\n    <label for=\"max_value\">Maximum counter value</label>\n    <input type=\"number\" name=\"max_value\" pattern=\"[0-9]*\">\n  </p>\n  <button class=\"add_counter\">Add counter</button>\n  <button class=\"add_counter_cancel\">Cancel</button>\n</div>\n";
   return buffer;
   });
 

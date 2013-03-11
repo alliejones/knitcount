@@ -11,6 +11,10 @@
       this.templateData = __bind(this.templateData, this);
       this.render = __bind(this.render, this);
       this.renderCounter = __bind(this.renderCounter, this);
+      this.renderCounters = __bind(this.renderCounters, this);
+      this.toggleUseMaxValue = __bind(this.toggleUseMaxValue, this);
+      this.hideAddCounterOptions = __bind(this.hideAddCounterOptions, this);
+      this.showAddCounterOptions = __bind(this.showAddCounterOptions, this);
       this.toggleEditMode = __bind(this.toggleEditMode, this);
       this.deleteCounter = __bind(this.deleteCounter, this);
       this.addCounter = __bind(this.addCounter, this);
@@ -24,8 +28,11 @@
 
     ProjectView.prototype.events = {
       'click .back': 'goToProjectList',
+      'click .show_add_counter': 'showAddCounterOptions',
       'click .add_counter': 'addCounter',
-      'click .edit': 'toggleEditMode'
+      'click .add_counter_cancel': 'hideAddCounterOptions',
+      'click .edit': 'toggleEditMode',
+      'change input[name="use_max_value"]': 'toggleUseMaxValue'
     };
 
     ProjectView.prototype.initialize = function() {
@@ -33,7 +40,7 @@
       this.editMode = false;
       this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
       this.listenTo(KnitCount.counters, 'remove', this.model.updateCounters);
-      this.listenTo(this.model.counters, 'reset', this.render);
+      this.listenTo(this.model.counters, 'reset', this.renderCounters);
       return this.on('change:editMode', this.render);
     };
 
@@ -44,14 +51,18 @@
     };
 
     ProjectView.prototype.addCounter = function() {
-      var id;
+      var id, maxValue, name;
       id = KnitCount.generateID('counters');
-      return KnitCount.counters.add(new KnitCount.Models.Counter({
+      maxValue = this.$('input[name="max_value"]').val();
+      name = this.$('input[name="name"]').val();
+      KnitCount.counters.add(new KnitCount.Models.Counter({
         id: id,
-        name: "Counter " + id,
+        name: name,
         value: 0,
+        max_value: maxValue,
         project_id: this.model.get('id')
       }));
+      return this.hideAddCounterOptions();
     };
 
     ProjectView.prototype.deleteCounter = function(e) {
@@ -65,6 +76,33 @@
       return this.trigger('change:editMode');
     };
 
+    ProjectView.prototype.showAddCounterOptions = function() {
+      return this.$('#add_counter_options').removeClass('hidden');
+    };
+
+    ProjectView.prototype.hideAddCounterOptions = function() {
+      return this.$('#add_counter_options').addClass('hidden');
+    };
+
+    ProjectView.prototype.toggleUseMaxValue = function(e) {
+      var cb, input;
+      cb = $(e.target);
+      input = this.$('#max_value_input');
+      if (cb.is(':checked')) {
+        return input.removeClass('hidden');
+      } else {
+        return input.addClass('hidden');
+      }
+    };
+
+    ProjectView.prototype.renderCounters = function() {
+      var _this = this;
+      this.$('.counters').empty();
+      return this.model.counters.each(function(counter) {
+        return _this.renderCounter(counter);
+      });
+    };
+
     ProjectView.prototype.renderCounter = function(counter) {
       var view;
       view = new KnitCount.Views.Counter({
@@ -76,12 +114,8 @@
     };
 
     ProjectView.prototype.render = function() {
-      var _this = this;
       ProjectView.__super__.render.apply(this, arguments);
-      this.$('.counters').empty();
-      this.model.counters.each(function(counter) {
-        return _this.renderCounter(counter);
-      });
+      this.renderCounters();
       return this;
     };
 

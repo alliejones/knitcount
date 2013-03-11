@@ -44,10 +44,10 @@ function program3(depth0,data) {
 
   buffer += "<a href=\"#\" class=\"back\">Back to project list</a>\n\n<h2>"
     + escapeExpression(((stack1 = ((stack1 = depth0.project),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"add_counter\">Add Counter</button></p>\n\n<p><button class=\"edit\">";
+    + "</h2>\n\n<ul class=\"counters\"></ul>\n\n<p><button class=\"show_add_counter\">Add Counter</button></p>\n\n<p><button class=\"edit\">";
   stack2 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "</button></p>\n";
+  buffer += "</button></p>\n\n<div id=\"add_counter_options\" class=\"hidden\">\n  <h3>Add a counter</h3>\n  <p>\n    <label for=\"name\">Name</label>\n    <input type=\"text\" name=\"name\">\n  </p>\n  <p>\n    <label for=\"use_max_value\">\n      <input type=\"checkbox\" name=\"use_max_value\"> Set a maximum counter value\n    </label>\n  </p>\n  <p id=\"max_value_input\" class=\"hidden\">\n    <label for=\"max_value\">Maximum counter value</label>\n    <input type=\"number\" name=\"max_value\" pattern=\"[0-9]*\">\n  </p>\n  <button class=\"add_counter\">Add counter</button>\n  <button class=\"add_counter_cancel\">Cancel</button>\n</div>\n";
   return buffer;
   });
 

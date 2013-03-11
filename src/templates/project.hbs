@@ -4,6 +4,27 @@
 
 <ul class="counters"></ul>
 
-<p><button class="add_counter">Add Counter</button></p>
+<p><button class="show_add_counter">Add Counter</button></p>
 
 <p><button class="edit">{{#if editMode}}Done Editing{{else}}Edit Counters{{/if}}</button></p>
+
+<div id="add_counter_options" class="hidden">
+<form>
+  <h3>Add a counter</h3>
+  <p>
+    <label for="name">Name</label>
+    <input type="text" name="name">
+  </p>
+  <p>
+    <label>
+      <input type="checkbox" name="use_max_value"> Set a maximum counter value
+    </label>
+  </p>
+  <p id="max_value_input" class="hidden">
+    <label for="max_value">Maximum counter value</label>
+    <input type="number" name="max_value" pattern="[0-9]*">
+  </p>
+  <button class="add_counter">Add counter</button>
+  <button class="add_counter_cancel">Cancel</button>
+</form>
+</div>

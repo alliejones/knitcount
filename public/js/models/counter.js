@@ -14,7 +14,15 @@
     }
 
     Counter.prototype.increment = function() {
-      return this.set('value', this.get('value') + 1);
+      var maxValue, newValue;
+      newValue = this.get('value') + 1;
+      maxValue = this.get('max_value');
+      if ((maxValue != null) && newValue > maxValue) {
+        this.set('value', 0);
+        return this.trigger('counter:reset');
+      } else {
+        return this.set('value', newValue);
+      }
     };
 
     Counter.prototype.decrement = function() {
@@ -46,27 +54,32 @@
             id: 1,
             name: 'Counter One',
             value: 6,
-            project_id: 1
+            project_id: 1,
+            max_value: 10
           }, {
             id: 2,
             name: 'Counter Two',
             value: 0,
-            project_id: 1
+            project_id: 1,
+            max_value: null
           }, {
             id: 3,
             name: 'Counter Three',
             value: 0,
-            project_id: 2
+            project_id: 2,
+            max_value: null
           }, {
             id: 4,
             name: 'Counter Four',
             value: 1,
-            project_id: 3
+            project_id: 3,
+            max_value: null
           }, {
             id: 5,
             name: 'Counter Five',
             value: 32,
-            project_id: 1
+            project_id: 1,
+            max_value: null
           }
         ]);
       }
