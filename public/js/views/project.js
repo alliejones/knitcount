@@ -57,6 +57,9 @@
 
     ProjectView.prototype.toggleEditMode = function() {
       this.editMode = !this.editMode;
+      setTimeout((function() {
+        return $('body').toggleClass('edit_mode');
+      }), 0);
       return this.trigger('change:editMode');
     };
 

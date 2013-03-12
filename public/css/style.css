@@ -1087,7 +1087,10 @@ p {
   height: 3.5em;
   overflow: hidden;
   position: relative;
-  width: 100%; }
+  width: 100%;
+  -webkit-transition: height 0.2s ease; }
+  .edit_mode .counters .row {
+    height: 7em; }
   .row:nth-child(even) {
     background: #eee; }
   .row a, .row span {
@@ -1099,20 +1102,37 @@ p {
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 82%; }
+    .edit_mode .counters .row a, .edit_mode .counters .row span {
+      height: 50%; }
   .row span.name {
-    width: 60%; }
+    width: 60%;
+    -webkit-transition: all 0.2s ease; }
+    .edit_mode .counters .row span.name {
+      width: 80%; }
   .row span.value {
     background: rgba(255, 255, 255, 0.3);
     padding: 0.65em 0;
     font-size: 1.5em;
     font-weight: bold;
     text-align: center;
-    width: 20%; }
+    width: 20%;
+    height: 2.35em; }
   .row button {
     float: right;
     margin-right: 2.5%;
     margin-top: 1.1em;
     width: 13%; }
+  .row .drawer {
+    clear: both;
+    text-align: center;
+    width: 100%; }
+    .row .drawer button {
+      display: inline-block;
+      float: none;
+      width: 27%; }
+
+.edit_mode .row > .increment {
+  display: none; }
 
 .row.inline_form input {
   font-size: 1em;

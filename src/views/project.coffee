@@ -27,6 +27,7 @@ class KnitCount.Views.ProjectView extends KnitCount.View
 
   toggleEditMode: =>
     @editMode = !@editMode
+    setTimeout (-> $('body').toggleClass('edit_mode')), 0
     @trigger 'change:editMode'
 
   renderCounters: =>

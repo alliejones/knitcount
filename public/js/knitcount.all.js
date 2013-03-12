@@ -626,6 +626,9 @@
 
     ProjectView.prototype.toggleEditMode = function() {
       this.editMode = !this.editMode;
+      setTimeout((function() {
+        return $('body').toggleClass('edit_mode');
+      }), 0);
       return this.trigger('change:editMode');
     };
 
@@ -755,24 +758,9 @@ this["KnitCount"]["Templates"] = this["KnitCount"]["Templates"] || {};
 this["KnitCount"]["Templates"]["counter"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n  <button class=\"delete\"><i class=\"icon-remove-sign icon-large\"></i></button>\n  <button class=\"decrement\"><i class=\"icon-minus icon-large\"></i></button>\n  ";
-  stack1 = helpers['if'].call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  
-  return "\n    <button class=\"increment\"><i class=\"icon-plus icon-large\"></i></button>\n  ";
-  }
-
-function program4(depth0,data) {
   
   
   return "\n  <button class=\"increment\"><i class=\"icon-plus icon-large\"></i></button>\n";
@@ -786,13 +774,10 @@ function program4(depth0,data) {
   if (stack1 = helpers.value) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.value; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</span>\n";
-  stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+    + "</span>\n\n";
+  stack1 = helpers.unless.call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n";
-  stack1 = helpers.unless.call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n";
+  buffer += "\n\n<div class=\"drawer\">\n  <button class=\"increment\"><i class=\"icon-plus icon-large\"></i> more</button>\n  <button class=\"decrement\"><i class=\"icon-minus icon-large\"></i> less</button>\n  <button class=\"delete\"><i class=\"icon-remove-sign icon-large\"></i> delete</button>\n</div>\n";
   return buffer;
   });
 
@@ -827,7 +812,7 @@ function program3(depth0,data) {
     + "\n    <button class=\"edit\">";
   stack2 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "</button>\n  </h2>\n</header>\n\n<ul class=\"counters\">\n  <li class=\"row add_counter_form\">\n    <button class=\"show_add_counter\">add counter <i class=\"icon-plus icon-large\"></i></button>\n  </li>\n</ul>\n";
+  buffer += "</button>\n  </h2>\n</header>\n\n<ul class=\"counters\"></ul>\n\n<button class=\"show_add_counter\">add counter <i class=\"icon-plus icon-large\"></i></button>\n";
   return buffer;
   });
 

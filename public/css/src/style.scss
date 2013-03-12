@@ -47,6 +47,9 @@ p {
   overflow: hidden;
   position: relative;
   width: 100%;
+  -webkit-transition: height .2s ease;
+
+  .edit_mode .counters & { height: 7em; }
 
   &:nth-child(even) { background: #eee; }
 
@@ -59,10 +62,15 @@ p {
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 82%;
+
+    .edit_mode .counters & { height: 50% ;}
   }
 
   span.name {
     width: 60%;
+    -webkit-transition: all .2s ease;
+
+    .edit_mode .counters & { width: 80%; }
   }
 
   span.value {
@@ -72,6 +80,7 @@ p {
     font-weight: bold;
     text-align: center;
     width: 20%;
+    height: 2.35em;
   }
 
   button {
@@ -80,7 +89,21 @@ p {
     margin-top: 1.1em;
     width: 13%;
   }
+
+  .drawer {
+    clear: both;
+    text-align: center;
+    width: 100%;
+
+    button {
+      display: inline-block;
+      float: none;
+      width: 27%;
+    }
+  }
 }
+
+.edit_mode .row > .increment { display: none; }
 
 .row.inline_form {
   input {

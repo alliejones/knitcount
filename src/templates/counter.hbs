@@ -1,12 +1,11 @@
 <span class="name">{{name}}</span> <span class="value">{{value}}</span>
-{{#if editMode}}
-  <button class="delete"><i class="icon-remove-sign icon-large"></i></button>
-  <button class="decrement"><i class="icon-minus icon-large"></i></button>
-  {{#if linked_counter_id}}
-    <button class="increment"><i class="icon-plus icon-large"></i></button>
-  {{/if}}
-{{/if}}
 
 {{#unless linked_counter_id}}
   <button class="increment"><i class="icon-plus icon-large"></i></button>
 {{/unless}}
+
+<div class="drawer">
+  <button class="increment"><i class="icon-plus icon-large"></i> more</button>
+  <button class="decrement"><i class="icon-minus icon-large"></i> less</button>
+  <button class="delete"><i class="icon-remove-sign icon-large"></i> delete</button>
+</div>
