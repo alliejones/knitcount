@@ -1,5 +1,6 @@
 class KnitCount.Views.Counter extends KnitCount.View
   tagName: 'li'
+  className: 'row'
   templateName: 'counter'
 
   events:

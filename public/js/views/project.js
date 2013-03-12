@@ -61,11 +61,15 @@
     };
 
     ProjectView.prototype.renderCounters = function() {
-      var _this = this;
-      this.$('.counters').empty();
-      return this.model.counters.each(function(counter) {
+      var addForm, counterList,
+        _this = this;
+      counterList = this.$('.counters');
+      addForm = $('.add_counter_form', counterList).detach();
+      counterList.empty();
+      this.model.counters.each(function(counter) {
         return _this.renderCounter(counter);
       });
+      return counterList.append(addForm);
     };
 
     ProjectView.prototype.renderCounter = function(counter) {

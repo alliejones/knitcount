@@ -18,6 +18,8 @@
 
     Counter.prototype.tagName = 'li';
 
+    Counter.prototype.className = 'row';
+
     Counter.prototype.templateName = 'counter';
 
     Counter.prototype.events = {

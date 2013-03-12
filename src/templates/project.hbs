@@ -1,11 +1,13 @@
 <header>
-  <button class="back button-left"><i class="icon-arrow-left icon-large"></i></button>
-  <h2>{{project.name}}</h2>
+  <h2>
+    <button class="back button-left"><i class="icon-arrow-left icon-large"></i></button>
+    {{project.name}}
+    <button class="edit">{{#if editMode}}<i class="icon-ok icon-large"></i> done{{else}}<i class="icon-pencil icon-large"></i> edit{{/if}}</button>
+  </h2>
 </header>
 
-<ul class="counters"></ul>
-
-<p>
-  <button class="show_add_counter">Add Counter</button>
-  <button class="edit">{{#if editMode}}Done Editing{{else}}Edit Counters{{/if}}</button>
-</p>
+<ul class="counters">
+  <li class="row add_counter_form">
+    <button class="show_add_counter">add counter <i class="icon-plus icon-large"></i></button>
+  </li>
+</ul>

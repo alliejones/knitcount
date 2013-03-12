@@ -34,7 +34,7 @@
       return $('#container').html(view.el);
     };
 
-    Router.prototype.createCounter = function(projectId) {
+    Router.prototype.createCounter = function(projectId, query) {
       var view;
       view = new KnitCount.Views.CreateCounterView({
         model: new KnitCount.Models.Counter({

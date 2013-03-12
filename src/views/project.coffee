@@ -30,8 +30,11 @@ class KnitCount.Views.ProjectView extends KnitCount.View
     @trigger 'change:editMode'
 
   renderCounters: =>
-    this.$('.counters').empty()
+    counterList = this.$('.counters')
+    addForm = $('.add_counter_form', counterList).detach()
+    counterList.empty()
     @model.counters.each (counter) => @renderCounter counter
+    counterList.append(addForm)
 
   renderCounter: (counter) =>
     view = new KnitCount.Views.Counter( model: counter, parentView: this )
