@@ -130,7 +130,7 @@
       return $('#container').html(view.el);
     };
 
-    Router.prototype.createCounter = function(projectId) {
+    Router.prototype.createCounter = function(projectId, query) {
       var view;
       view = new KnitCount.Views.CreateCounterView({
         model: new KnitCount.Models.Counter({
@@ -445,6 +445,8 @@
 
     Counter.prototype.tagName = 'li';
 
+    Counter.prototype.className = 'row';
+
     Counter.prototype.templateName = 'counter';
 
     Counter.prototype.events = {
@@ -624,15 +626,22 @@
 
     ProjectView.prototype.toggleEditMode = function() {
       this.editMode = !this.editMode;
+      setTimeout((function() {
+        return $('body').toggleClass('edit_mode');
+      }), 0);
       return this.trigger('change:editMode');
     };
 
     ProjectView.prototype.renderCounters = function() {
-      var _this = this;
-      this.$('.counters').empty();
-      return this.model.counters.each(function(counter) {
+      var addForm, counterList,
+        _this = this;
+      counterList = this.$('.counters');
+      addForm = $('.add_counter_form', counterList).detach();
+      counterList.empty();
+      this.model.counters.each(function(counter) {
         return _this.renderCounter(counter);
       });
+      return counterList.append(addForm);
     };
 
     ProjectView.prototype.renderCounter = function(counter) {
@@ -749,44 +758,26 @@ this["KnitCount"]["Templates"] = this["KnitCount"]["Templates"] || {};
 this["KnitCount"]["Templates"]["counter"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n  <button class=\"delete\"><i class=\"icon-remove-sign icon-large\"></i></button>\n  <button class=\"decrement\"><i class=\"icon-minus icon-large\"></i></button>\n  ";
-  stack1 = helpers['if'].call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  
-  return "\n    <button class=\"increment\"><i class=\"icon-plus icon-large\"></i></button>\n  ";
-  }
-
-function program4(depth0,data) {
   
   
   return "\n  <button class=\"increment\"><i class=\"icon-plus icon-large\"></i></button>\n";
   }
 
-  buffer += "<span>";
+  buffer += "<span class=\"name\">";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + ": ";
+    + "</span> <span class=\"value\">";
   if (stack1 = helpers.value) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.value; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</span>\n";
-  stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+    + "</span>\n\n";
+  stack1 = helpers.unless.call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n";
-  stack1 = helpers.unless.call(depth0, depth0.linked_counter_id, {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n";
+  buffer += "\n\n<div class=\"drawer\">\n  <button class=\"increment\"><i class=\"icon-plus icon-large\"></i> more</button>\n  <button class=\"decrement\"><i class=\"icon-minus icon-large\"></i> less</button>\n  <button class=\"delete\"><i class=\"icon-remove-sign icon-large\"></i> delete</button>\n</div>\n";
   return buffer;
   });
 
@@ -807,21 +798,21 @@ helpers = helpers || Handlebars.helpers; data = data || {};
 function program1(depth0,data) {
   
   
-  return "Done Editing";
+  return "<i class=\"icon-ok icon-large\"></i> done";
   }
 
 function program3(depth0,data) {
   
   
-  return "Edit Counters";
+  return "<i class=\"icon-pencil icon-large\"></i> edit";
   }
 
-  buffer += "<header>\n  <button class=\"back button-left\"><i class=\"icon-arrow-left icon-large\"></i></button>\n  <h2>"
+  buffer += "<header>\n  <h2>\n    <button class=\"back button-left\"><i class=\"icon-arrow-left icon-large\"></i></button>\n    "
     + escapeExpression(((stack1 = ((stack1 = depth0.project),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</h2>\n</header>\n\n<ul class=\"counters\"></ul>\n\n<p>\n  <button class=\"show_add_counter\">Add Counter</button>\n  <button class=\"edit\">";
+    + "\n    <button class=\"edit\">";
   stack2 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "</button>\n</p>";
+  buffer += "</button>\n  </h2>\n</header>\n\n<ul class=\"counters\"></ul>\n\n<button class=\"show_add_counter\">add counter <i class=\"icon-plus icon-large\"></i></button>\n";
   return buffer;
   });
 
@@ -845,7 +836,7 @@ function program3(depth0,data) {
 function program5(depth0,data,depth1) {
   
   var buffer = "", stack1;
-  buffer += "\n  <li class=\"project\">\n    <a href=\"\" data-id=\"";
+  buffer += "\n  <li class=\"project row\">\n    <a href=\"\" data-id=\"";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
   buffer += escapeExpression(stack1)
@@ -865,12 +856,12 @@ function program6(depth0,data) {
   return "<button class=\"delete_project\"><i class=\"icon-remove-sign icon-large\"></i></button>";
   }
 
-  buffer += "<header>\n  <h2>Projects</h2>\n  <button class=\"edit button-side\">";
+  buffer += "<header>\n  <h2>\n    Projects\n    <button class=\"edit button-side\">";
   stack1 = helpers['if'].call(depth0, depth0.editMode, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "</button>\n</header>\n<ul>\n";
+  buffer += "</button>\n  </h2>\n</header>\n<ul>\n";
   stack1 = helpers.each.call(depth0, depth0.collection, {hash:{},inverse:self.noop,fn:self.programWithDepth(program5, data, depth0),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>\n\n<p>\n  <label>New Project <input type=\"text\" name=\"new_project_name\" placeholder=\"Name\"></label>\n  <button class=\"add_project\"><i class=\"icon-plus icon-large\"></i> add</button>\n</p>\n\n";
+  buffer += "\n  <li class=\"row inline_form\">\n    <label><input type=\"text\" name=\"new_project_name\" placeholder=\"Project Name\"></label>\n    <button class=\"add_project\"><i class=\"icon-plus icon-large\"></i></button>\n  </li>\n</ul>\n";
   return buffer;
   });
