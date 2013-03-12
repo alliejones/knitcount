@@ -1,17 +1,18 @@
-<h2>Projects</h2>
-
+<header>
+  <h2>Projects</h2>
+  <button class="edit button-side">{{#if editMode}}<i class="icon-ok icon-large"></i> done{{else}}<i class="icon-pencil icon-large"></i> edit{{/if}}</button>
+</header>
 <ul>
 {{#each collection}}
   <li class="project">
     <a href="" data-id="{{id}}">{{name}}</a>
-    {{#if ../editMode}}<button class="delete_project">Delete</button>{{/if}}
+    {{#if ../editMode}}<button class="delete_project"><i class="icon-remove-sign icon-large"></i></button>{{/if}}
   </li>
 {{/each}}
 </ul>
 
 <p>
-  <label>New Project Name <input type="text" name="new_project_name" value="New Project"></label>
-  <button class="add_project">Add Project</button>
+  <label>New Project <input type="text" name="new_project_name" placeholder="Name"></label>
+  <button class="add_project"><i class="icon-plus icon-large"></i> add</button>
 </p>
 
-<p><button class="edit">{{#if editMode}}Done Editing{{else}}Edit Projects{{/if}}</button></p>

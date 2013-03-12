@@ -46,12 +46,13 @@
 
     ProjectListView.prototype.deleteProject = function(e) {
       var id;
-      id = $(e.target).prev('a').data('id');
+      id = $(e.target).closest('button').prev('a').data('id');
       return KnitCount.projects.remove(KnitCount.getProject(id));
     };
 
     ProjectListView.prototype.toggleEditMode = function() {
       this.editMode = !this.editMode;
+      $('body').toggleClass('edit_mode');
       return this.trigger('change:editMode');
     };
 

@@ -1,9 +1,11 @@
-<a href="#" class="back">Back to project list</a>
-
-<h2>{{project.name}}</h2>
+<header>
+  <button class="back button-left"><i class="icon-arrow-left icon-large"></i></button>
+  <h2>{{project.name}}</h2>
+</header>
 
 <ul class="counters"></ul>
 
-<p><button class="show_add_counter">Add Counter</button></p>
-
-<p><button class="edit">{{#if editMode}}Done Editing{{else}}Edit Counters{{/if}}</button></p>
+<p>
+  <button class="show_add_counter">Add Counter</button>
+  <button class="edit">{{#if editMode}}Done Editing{{else}}Edit Counters{{/if}}</button>
+</p>
