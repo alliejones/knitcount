@@ -1053,10 +1053,14 @@ ul.icons {
   box-sizing: border-box; }
 
 body {
+  background: #f7fcfd;
+  color: #2b2f2f;
   font-family: "Verdana", sans-serif;
-  font-size: 16px; }
+  font-size: 16px;
+  text-shadow: 0 1px 0 white, 0 -1px 0 #dbf1f4; }
 
 a {
+  color: #2b2f2f;
   text-decoration: none; }
 
 header {
@@ -1082,7 +1086,8 @@ p {
   width: 100%; }
 
 .row {
-  background: #ddd;
+  background: #dbf1f4;
+  border-top: 1px solid #d3eef2;
   display: block;
   height: 3.5em;
   overflow: hidden;
@@ -1092,7 +1097,7 @@ p {
   .edit_mode .counters .row {
     height: 7em; }
   .row:nth-child(even) {
-    background: #eee; }
+    background: #eefafb; }
   .row a, .row span {
     display: block;
     float: left;
@@ -1155,7 +1160,7 @@ button, input, select {
   padding: 0.6em 0.8em; }
 
 button {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(20, 130, 144, 0.5);
   border: 0;
   text-align: center; }
   button:focus, button:active {
