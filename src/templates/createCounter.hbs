@@ -12,9 +12,9 @@
 </p>
 <p id="max_value_input" class="hidden">
   <label for="max_value">Maximum counter value</label>
-  <input type="number" name="max_value" pattern="[0-9]*">
+  <input type="number" name="max_value" pattern="[0-9]*" value="99" min="1" max="99">
 </p>
-
+{{#if unlinkedCounters}}
 <p>
   <label>
     <input type="checkbox" name="use_linked_counter"> Link this counter to another counter
@@ -22,9 +22,13 @@
 </p>
 <p id="linked_counter_input" class="hidden">
   <select name="linked_counter_id">
-    <option>Select a counter</option>
+    <option value="">Select a counter</option>
+  {{#each unlinkedCounters}}
+    <option value="{{id}}">{{name}}</option>
+  {{/each}}
   </select>
 </p>
+{{/if}}
 
 <button class="add_counter">Add counter</button>
 <button class="add_counter_cancel">Cancel</button>

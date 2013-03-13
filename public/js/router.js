@@ -29,17 +29,23 @@
       model = KnitCount.getProject(id);
       model.updateCounters();
       view = new KnitCount.Views.ProjectView({
-        model: model
+        model: model,
+        editMode: false
       }).render();
       return $('#container').html(view.el);
     };
 
     Router.prototype.createCounter = function(projectId, query) {
-      var view;
+      var project, unlinkedCounters, view;
+      project = KnitCount.getProject(projectId);
+      unlinkedCounters = project.counters.filter(function(counter) {
+        return counter.get('linked_counter_id') === null;
+      });
       view = new KnitCount.Views.CreateCounterView({
         model: new KnitCount.Models.Counter({
           project_id: +projectId
-        })
+        }),
+        unlinked_counters: new KnitCount.Collections.Counters(unlinkedCounters)
       }).render();
       return $('#container').html(view.el);
     };

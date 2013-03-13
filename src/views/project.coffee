@@ -7,10 +7,10 @@ class KnitCount.Views.ProjectView extends KnitCount.View
     'click .show_add_counter': 'goToAddCounter'
     'click .edit': 'toggleEditMode'
 
-  initialize: =>
+  initialize: (settings) =>
     super
 
-    @editMode = false
+    @editMode = settings.editMode || false
 
     @listenTo KnitCount.counters, 'add', @model.updateCounters
     @listenTo KnitCount.counters, 'remove', @model.updateCounters
@@ -27,15 +27,13 @@ class KnitCount.Views.ProjectView extends KnitCount.View
 
   toggleEditMode: =>
     @editMode = !@editMode
+    # timeout needed to redraw styles so css transitions will be triggered
     setTimeout (-> $('body').toggleClass('edit_mode')), 0
     @trigger 'change:editMode'
 
   renderCounters: =>
-    counterList = this.$('.counters')
-    addForm = $('.add_counter_form', counterList).detach()
-    counterList.empty()
+    this.$('.counters').empty()
     @model.counters.each (counter) => @renderCounter counter
-    counterList.append(addForm)
 
   renderCounter: (counter) =>
     view = new KnitCount.Views.Counter( model: counter, parentView: this )

@@ -1,14 +1,19 @@
 @import 'reset';
+@import 'css3';
 @import 'font-awesome';
 
 * { box-sizing: border-box; }
 
 body {
+  background: #f7fcfd;
+  color: #2b2f2f;
   font-family: "Verdana", sans-serif;
   font-size: 16px;
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #dbf1f4;
 }
 
 a {
+  color: #2b2f2f;
   text-decoration: none;
 }
 
@@ -41,7 +46,8 @@ p {
 }
 
 .row {
-  background: #ddd;
+  background: #dbf1f4;
+  border-top: 1px solid darken(#dbf1f4, 2%);
   display: block;
   height: 3.5em;
   overflow: hidden;
@@ -51,7 +57,9 @@ p {
 
   .edit_mode .counters & { height: 7em; }
 
-  &:nth-child(even) { background: #eee; }
+  &:nth-child(even) {
+    background: #eefafb;
+  }
 
   a, span {
     display: block;
@@ -132,7 +140,7 @@ button, input, select {
 }
 
 button {
-  background: rgba(#000, .1);
+  background: rgba(#148290,.5);
   border: 0;
   text-align: center;
 

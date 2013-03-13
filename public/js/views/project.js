@@ -28,9 +28,9 @@
       'click .edit': 'toggleEditMode'
     };
 
-    ProjectView.prototype.initialize = function() {
+    ProjectView.prototype.initialize = function(settings) {
       ProjectView.__super__.initialize.apply(this, arguments);
-      this.editMode = false;
+      this.editMode = settings.editMode || false;
       this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
       this.listenTo(KnitCount.counters, 'remove', this.model.updateCounters);
       this.listenTo(this.model.counters, 'reset', this.renderCounters);
@@ -64,15 +64,11 @@
     };
 
     ProjectView.prototype.renderCounters = function() {
-      var addForm, counterList,
-        _this = this;
-      counterList = this.$('.counters');
-      addForm = $('.add_counter_form', counterList).detach();
-      counterList.empty();
-      this.model.counters.each(function(counter) {
+      var _this = this;
+      this.$('.counters').empty();
+      return this.model.counters.each(function(counter) {
         return _this.renderCounter(counter);
       });
-      return counterList.append(addForm);
     };
 
     ProjectView.prototype.renderCounter = function(counter) {

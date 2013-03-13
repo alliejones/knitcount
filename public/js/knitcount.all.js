@@ -125,17 +125,23 @@
       model = KnitCount.getProject(id);
       model.updateCounters();
       view = new KnitCount.Views.ProjectView({
-        model: model
+        model: model,
+        editMode: false
       }).render();
       return $('#container').html(view.el);
     };
 
     Router.prototype.createCounter = function(projectId, query) {
-      var view;
+      var project, unlinkedCounters, view;
+      project = KnitCount.getProject(projectId);
+      unlinkedCounters = project.counters.filter(function(counter) {
+        return counter.get('linked_counter_id') === null;
+      });
       view = new KnitCount.Views.CreateCounterView({
         model: new KnitCount.Models.Counter({
           project_id: +projectId
-        })
+        }),
+        unlinked_counters: new KnitCount.Collections.Counters(unlinkedCounters)
       }).render();
       return $('#container').html(view.el);
     };
@@ -162,6 +168,11 @@
       this.initialize = __bind(this.initialize, this);
       Counter.__super__.constructor.apply(this, arguments);
     }
+
+    Counter.prototype.defaults = {
+      max_value: 99,
+      linked_counter_id: null
+    };
 
     Counter.prototype.initialize = function() {
       Counter.__super__.initialize.apply(this, arguments);
@@ -215,36 +226,27 @@
             id: 1,
             name: 'Counter One',
             value: 6,
-            project_id: 1,
-            max_value: 10,
-            linked_counter_id: null
+            project_id: 1
           }, {
             id: 2,
             name: 'Counter Two',
             value: 0,
-            project_id: 1,
-            max_value: 3,
-            linked_counter_id: null
+            project_id: 1
           }, {
             id: 3,
             name: 'Counter Three',
             value: 0,
-            project_id: 2,
-            max_value: null,
-            linked_counter_id: null
+            project_id: 2
           }, {
             id: 4,
             name: 'Counter Four',
             value: 1,
-            project_id: 3,
-            max_value: null,
-            linked_counter_id: null
+            project_id: 3
           }, {
             id: 5,
             name: 'Linked to One',
             value: 2,
             project_id: 1,
-            max_value: null,
             linked_counter_id: 1
           }, {
             id: 6,
@@ -496,6 +498,7 @@
     __extends(CreateCounterView, _super);
 
     function CreateCounterView() {
+      this.templateData = __bind(this.templateData, this);
       this.saveCounter = __bind(this.saveCounter, this);
       this.addCounter = __bind(this.addCounter, this);
       this.toggleFormField = __bind(this.toggleFormField, this);
@@ -507,6 +510,11 @@
     CreateCounterView.prototype.id = 'add_counter_options';
 
     CreateCounterView.prototype.templateName = 'createCounter';
+
+    CreateCounterView.prototype.initialize = function(settings) {
+      CreateCounterView.__super__.initialize.apply(this, arguments);
+      return this.unlinkedCounters = settings.unlinked_counters;
+    };
 
     CreateCounterView.prototype.events = {
       'change input[name="use_max_value"]': 'toggleUseMaxValue',
@@ -548,17 +556,25 @@
     CreateCounterView.prototype.saveCounter = function() {
       var id, linked_counter_id, maxValue, name;
       id = KnitCount.generateID('counters');
-      maxValue = +(this.$('input[name="max_value"]').val());
+      maxValue = this.$('input[name="max_value"]').val();
       name = this.$('input[name="name"]').val();
-      linked_counter_id = +(this.$('select[name="counter_list"]').val());
+      linked_counter_id = this.$('select[name="linked_counter_id"]').val();
       this.model.set({
         id: id,
         name: name,
         value: 0,
-        max_value: maxValue != null ? maxValue : null,
-        linked_counter_id: linked_counter_id != null ? linked_counter_id : null
+        max_value: maxValue > 0 ? +maxValue : null,
+        linked_counter_id: linked_counter_id !== "" ? +linked_counter_id : null
       });
       return KnitCount.counters.add(this.model);
+    };
+
+    CreateCounterView.prototype.templateData = function() {
+      return {
+        model: this.model.toJSON(),
+        unlinkedCounters: this.unlinkedCounters.toJSON(),
+        blah: 'some stuff'
+      };
     };
 
     return CreateCounterView;
@@ -597,9 +613,9 @@
       'click .edit': 'toggleEditMode'
     };
 
-    ProjectView.prototype.initialize = function() {
+    ProjectView.prototype.initialize = function(settings) {
       ProjectView.__super__.initialize.apply(this, arguments);
-      this.editMode = false;
+      this.editMode = settings.editMode || false;
       this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
       this.listenTo(KnitCount.counters, 'remove', this.model.updateCounters);
       this.listenTo(this.model.counters, 'reset', this.renderCounters);
@@ -633,15 +649,11 @@
     };
 
     ProjectView.prototype.renderCounters = function() {
-      var addForm, counterList,
-        _this = this;
-      counterList = this.$('.counters');
-      addForm = $('.add_counter_form', counterList).detach();
-      counterList.empty();
-      this.model.counters.each(function(counter) {
+      var _this = this;
+      this.$('.counters').empty();
+      return this.model.counters.each(function(counter) {
         return _this.renderCounter(counter);
       });
-      return counterList.append(addForm);
     };
 
     ProjectView.prototype.renderCounter = function(counter) {
@@ -784,10 +796,37 @@ function program1(depth0,data) {
 this["KnitCount"]["Templates"]["createCounter"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
   
+  var buffer = "", stack1;
+  buffer += "\n<p>\n  <label>\n    <input type=\"checkbox\" name=\"use_linked_counter\"> Link this counter to another counter\n  </label>\n</p>\n<p id=\"linked_counter_input\" class=\"hidden\">\n  <select name=\"linked_counter_id\">\n    <option value=\"\">Select a counter</option>\n  ";
+  stack1 = helpers.each.call(depth0, depth0.unlinkedCounters, {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n  </select>\n</p>\n";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n    <option value=\"";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</option>\n  ";
+  return buffer;
+  }
 
-
-  return "<header>\n  <h2>Create a counter</h2>\n</header>\n<p>\n  <label for=\"name\">Name</label>\n  <input type=\"text\" name=\"name\">\n</p>\n<p>\n  <label>\n    <input type=\"checkbox\" name=\"use_max_value\"> Set a maximum counter value\n  </label>\n</p>\n<p id=\"max_value_input\" class=\"hidden\">\n  <label for=\"max_value\">Maximum counter value</label>\n  <input type=\"number\" name=\"max_value\" pattern=\"[0-9]*\">\n</p>\n\n<p>\n  <label>\n    <input type=\"checkbox\" name=\"use_linked_counter\"> Link this counter to another counter\n  </label>\n</p>\n<p id=\"linked_counter_input\" class=\"hidden\">\n  <select name=\"linked_counter_id\">\n    <option>Select a counter</option>\n  </select>\n</p>\n\n<button class=\"add_counter\">Add counter</button>\n<button class=\"add_counter_cancel\">Cancel</button>";
+  buffer += "<header>\n  <h2>Create a counter</h2>\n</header>\n<p>\n  <label for=\"name\">Name</label>\n  <input type=\"text\" name=\"name\">\n</p>\n<p>\n  <label>\n    <input type=\"checkbox\" name=\"use_max_value\"> Set a maximum counter value\n  </label>\n</p>\n<p id=\"max_value_input\" class=\"hidden\">\n  <label for=\"max_value\">Maximum counter value</label>\n  <input type=\"number\" name=\"max_value\" pattern=\"[0-9]*\" value=\"99\" min=\"1\" max=\"99\">\n</p>\n";
+  stack1 = helpers['if'].call(depth0, depth0.unlinkedCounters, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n<button class=\"add_counter\">Add counter</button>\n<button class=\"add_counter_cancel\">Cancel</button>";
+  return buffer;
   });
 
 this["KnitCount"]["Templates"]["project"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

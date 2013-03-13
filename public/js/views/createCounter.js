@@ -8,6 +8,7 @@
     __extends(CreateCounterView, _super);
 
     function CreateCounterView() {
+      this.templateData = __bind(this.templateData, this);
       this.saveCounter = __bind(this.saveCounter, this);
       this.addCounter = __bind(this.addCounter, this);
       this.toggleFormField = __bind(this.toggleFormField, this);
@@ -19,6 +20,11 @@
     CreateCounterView.prototype.id = 'add_counter_options';
 
     CreateCounterView.prototype.templateName = 'createCounter';
+
+    CreateCounterView.prototype.initialize = function(settings) {
+      CreateCounterView.__super__.initialize.apply(this, arguments);
+      return this.unlinkedCounters = settings.unlinked_counters;
+    };
 
     CreateCounterView.prototype.events = {
       'change input[name="use_max_value"]': 'toggleUseMaxValue',
@@ -60,17 +66,25 @@
     CreateCounterView.prototype.saveCounter = function() {
       var id, linked_counter_id, maxValue, name;
       id = KnitCount.generateID('counters');
-      maxValue = +(this.$('input[name="max_value"]').val());
+      maxValue = this.$('input[name="max_value"]').val();
       name = this.$('input[name="name"]').val();
-      linked_counter_id = +(this.$('select[name="counter_list"]').val());
+      linked_counter_id = this.$('select[name="linked_counter_id"]').val();
       this.model.set({
         id: id,
         name: name,
         value: 0,
-        max_value: maxValue != null ? maxValue : null,
-        linked_counter_id: linked_counter_id != null ? linked_counter_id : null
+        max_value: maxValue > 0 ? +maxValue : null,
+        linked_counter_id: linked_counter_id !== "" ? +linked_counter_id : null
       });
       return KnitCount.counters.add(this.model);
+    };
+
+    CreateCounterView.prototype.templateData = function() {
+      return {
+        model: this.model.toJSON(),
+        unlinkedCounters: this.unlinkedCounters.toJSON(),
+        blah: 'some stuff'
+      };
     };
 
     return CreateCounterView;

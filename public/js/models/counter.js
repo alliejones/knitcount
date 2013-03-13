@@ -15,6 +15,11 @@
       Counter.__super__.constructor.apply(this, arguments);
     }
 
+    Counter.prototype.defaults = {
+      max_value: 99,
+      linked_counter_id: null
+    };
+
     Counter.prototype.initialize = function() {
       Counter.__super__.initialize.apply(this, arguments);
       return this.listenTo(KnitCount.dispatcher, 'counter:rollover', this.linkedCounterUpdate);
@@ -67,36 +72,27 @@
             id: 1,
             name: 'Counter One',
             value: 6,
-            project_id: 1,
-            max_value: 10,
-            linked_counter_id: null
+            project_id: 1
           }, {
             id: 2,
             name: 'Counter Two',
             value: 0,
-            project_id: 1,
-            max_value: 3,
-            linked_counter_id: null
+            project_id: 1
           }, {
             id: 3,
             name: 'Counter Three',
             value: 0,
-            project_id: 2,
-            max_value: null,
-            linked_counter_id: null
+            project_id: 2
           }, {
             id: 4,
             name: 'Counter Four',
             value: 1,
-            project_id: 3,
-            max_value: null,
-            linked_counter_id: null
+            project_id: 3
           }, {
             id: 5,
             name: 'Linked to One',
             value: 2,
             project_id: 1,
-            max_value: null,
             linked_counter_id: 1
           }, {
             id: 6,
