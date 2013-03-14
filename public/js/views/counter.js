@@ -43,7 +43,7 @@
     };
 
     Counter.prototype["delete"] = function() {
-      return this.model.collection.remove(this.model);
+      return this.model.destroy();
     };
 
     Counter.prototype.templateData = function() {

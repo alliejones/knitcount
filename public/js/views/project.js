@@ -13,7 +13,6 @@
       this.renderCounter = __bind(this.renderCounter, this);
       this.renderCounters = __bind(this.renderCounters, this);
       this.toggleEditMode = __bind(this.toggleEditMode, this);
-      this.deleteCounter = __bind(this.deleteCounter, this);
       this.initialize = __bind(this.initialize, this);
       ProjectView.__super__.constructor.apply(this, arguments);
     }
@@ -38,21 +37,17 @@
     };
 
     ProjectView.prototype.goToProjectList = function() {
+      $('body').removeClass('edit_mode');
       return KnitCount.router.navigate('/', {
         trigger: true
       });
     };
 
     ProjectView.prototype.goToAddCounter = function() {
+      $('body').removeClass('edit_mode');
       return KnitCount.router.navigate("project/" + (this.model.get('id')) + "/new", {
         trigger: true
       });
-    };
-
-    ProjectView.prototype.deleteCounter = function(e) {
-      var id;
-      id = $(e.target).prev('a').data('id');
-      return KnitCount.projects.remove(KnitCount.getCounter(id));
     };
 
     ProjectView.prototype.toggleEditMode = function() {

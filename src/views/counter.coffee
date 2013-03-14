@@ -17,7 +17,7 @@ class KnitCount.Views.Counter extends KnitCount.View
 
   decrement: => @model.decrement()
 
-  delete: => @model.collection.remove(@model)
+  delete: => @model.destroy()
 
   templateData: =>
     data = @model.toJSON()

@@ -47,9 +47,10 @@
     };
 
     ProjectListView.prototype.deleteProject = function(e) {
-      var id;
+      var id, project;
       id = $(e.target).closest('button').prev('a').data('id');
-      return KnitCount.projects.remove(KnitCount.getProject(id));
+      project = KnitCount.getProject(id);
+      return project.destroy();
     };
 
     ProjectListView.prototype.toggleEditMode = function() {

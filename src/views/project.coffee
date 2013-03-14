@@ -18,12 +18,13 @@ class KnitCount.Views.ProjectView extends KnitCount.View
 
     @on 'change:editMode', @render
 
-  goToProjectList: -> KnitCount.router.navigate('/', trigger: true)
-  goToAddCounter: -> KnitCount.router.navigate("project/#{@model.get 'id'}/new", trigger: true)
+  goToProjectList: ->
+    $('body').removeClass('edit_mode')
+    KnitCount.router.navigate('/', trigger: true)
 
-  deleteCounter: (e) =>
-    id = $(e.target).prev('a').data('id')
-    KnitCount.projects.remove KnitCount.getCounter(id)
+  goToAddCounter: ->
+    $('body').removeClass('edit_mode')
+    KnitCount.router.navigate("project/#{@model.get 'id'}/new", trigger: true)
 
   toggleEditMode: =>
     @editMode = !@editMode

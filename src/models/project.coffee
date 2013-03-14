@@ -3,15 +3,25 @@ class KnitCount.Models.Project extends Backbone.Model
     @counters = new KnitCount.Collections.Counters
     @updateCounters()
 
+    @on 'destroy', @destroyCounters
+
+    @listenTo @counters, 'add', @updateCounters()
+    @listenTo @counters, 'remove', @updateCounters()
+
   toJSON: =>
-    attr = _.clone(@attributes, )
+    attr = _.clone(@attributes)
     attr.counters = @counters.toJSON()
     attr
 
   updateCounters: =>
-    counters = KnitCount.counters.where({ project_id: @get('id') })
-    _.each counters, (counter) -> counter.project = this
-    @counters.reset counters
+    @counters.reset KnitCount.counters.where(project_id: @get 'id')
+    @counters.each (counter) -> counter.project = this
+
+  destroyCounters: =>
+    # can't delete things from a collection while iterating over it
+    # so make a copy of the model array instead
+    counters = _.clone(@counters.models)
+    _.each counters, (c) -> c.destroy()
 
 
 class KnitCount.Collections.Projects extends Backbone.Collection

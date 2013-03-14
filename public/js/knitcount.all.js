@@ -242,6 +242,7 @@
     __extends(Project, _super);
 
     function Project() {
+      this.destroyCounters = __bind(this.destroyCounters, this);
       this.updateCounters = __bind(this.updateCounters, this);
       this.toJSON = __bind(this.toJSON, this);
       Project.__super__.constructor.apply(this, arguments);
@@ -249,7 +250,10 @@
 
     Project.prototype.initialize = function() {
       this.counters = new KnitCount.Collections.Counters;
-      return this.updateCounters();
+      this.updateCounters();
+      this.on('destroy', this.destroyCounters);
+      this.listenTo(this.counters, 'add', this.updateCounters());
+      return this.listenTo(this.counters, 'remove', this.updateCounters());
     };
 
     Project.prototype.toJSON = function() {
@@ -260,14 +264,20 @@
     };
 
     Project.prototype.updateCounters = function() {
-      var counters;
-      counters = KnitCount.counters.where({
+      this.counters.reset(KnitCount.counters.where({
         project_id: this.get('id')
-      });
-      _.each(counters, function(counter) {
+      }));
+      return this.counters.each(function(counter) {
         return counter.project = this;
       });
-      return this.counters.reset(counters);
+    };
+
+    Project.prototype.destroyCounters = function() {
+      var counters;
+      counters = _.clone(this.counters.models);
+      return _.each(counters, function(c) {
+        return c.destroy();
+      });
     };
 
     return Project;
@@ -423,7 +433,7 @@
     };
 
     Counter.prototype["delete"] = function() {
-      return this.model.collection.remove(this.model);
+      return this.model.destroy();
     };
 
     Counter.prototype.templateData = function() {
@@ -550,7 +560,6 @@
       this.renderCounter = __bind(this.renderCounter, this);
       this.renderCounters = __bind(this.renderCounters, this);
       this.toggleEditMode = __bind(this.toggleEditMode, this);
-      this.deleteCounter = __bind(this.deleteCounter, this);
       this.initialize = __bind(this.initialize, this);
       ProjectView.__super__.constructor.apply(this, arguments);
     }
@@ -575,21 +584,17 @@
     };
 
     ProjectView.prototype.goToProjectList = function() {
+      $('body').removeClass('edit_mode');
       return KnitCount.router.navigate('/', {
         trigger: true
       });
     };
 
     ProjectView.prototype.goToAddCounter = function() {
+      $('body').removeClass('edit_mode');
       return KnitCount.router.navigate("project/" + (this.model.get('id')) + "/new", {
         trigger: true
       });
-    };
-
-    ProjectView.prototype.deleteCounter = function(e) {
-      var id;
-      id = $(e.target).prev('a').data('id');
-      return KnitCount.projects.remove(KnitCount.getCounter(id));
     };
 
     ProjectView.prototype.toggleEditMode = function() {
@@ -685,9 +690,10 @@
     };
 
     ProjectListView.prototype.deleteProject = function(e) {
-      var id;
+      var id, project;
       id = $(e.target).closest('button').prev('a').data('id');
-      return KnitCount.projects.remove(KnitCount.getProject(id));
+      project = KnitCount.getProject(id);
+      return project.destroy();
     };
 
     ProjectListView.prototype.toggleEditMode = function() {

@@ -25,7 +25,8 @@ class KnitCount.Views.ProjectListView extends KnitCount.CollectionView
 
   deleteProject: (e) =>
     id = $(e.target).closest('button').prev('a').data('id')
-    KnitCount.projects.remove KnitCount.getProject(id)
+    project = KnitCount.getProject(id)
+    project.destroy()
 
   toggleEditMode: =>
     @editMode = !@editMode
