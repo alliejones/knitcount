@@ -10,6 +10,7 @@ module.exports = function(grunt) {
         'jquery': '~1.8',
         'underscore': '',
         'backbone': '',
+        'backbone.localStorage': '',
         'handlebars': ''
       }
     },

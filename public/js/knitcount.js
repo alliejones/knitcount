@@ -9,9 +9,9 @@
     Views: {},
     init: function() {
       this.counters = new KnitCount.Collections.Counters();
-      this.counters.sync('read');
+      this.counters.fetch();
       this.projects = new KnitCount.Collections.Projects();
-      this.projects.sync('read');
+      this.projects.fetch();
       this.router = new KnitCount.Router;
       return Backbone.history.start();
     },
@@ -26,6 +26,9 @@
       allModels = KnitCount[allModelsName];
       if (allModels == null) {
         return null;
+      }
+      if (allModels.length === 0) {
+        return 1;
       }
       return (allModels.max(function(m) {
         return m.id;

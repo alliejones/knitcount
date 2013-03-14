@@ -5,10 +5,9 @@ window.KnitCount =
 
   init: ->
     @counters = new KnitCount.Collections.Counters()
-    @counters.sync('read')
-
+    @counters.fetch()
     @projects = new KnitCount.Collections.Projects()
-    @projects.sync('read')
+    @projects.fetch()
 
     @router = new KnitCount.Router
     Backbone.history.start()
@@ -21,6 +20,7 @@ window.KnitCount =
   generateID: (allModelsName) ->
     allModels = KnitCount[allModelsName]
     return null unless allModels?
+    return 1 if allModels.length == 0
     (allModels.max (m) -> m.id).id + 1
 
 

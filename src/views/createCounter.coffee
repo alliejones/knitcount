@@ -45,6 +45,7 @@ class KnitCount.Views.CreateCounterView extends KnitCount.View
       linked_counter_id: if linked_counter_id != "" then +linked_counter_id else null
     )
     KnitCount.counters.add @model
+    @model.save()
 
   templateData: =>
     model: @model.toJSON()

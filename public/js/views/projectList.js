@@ -36,12 +36,14 @@
     };
 
     ProjectListView.prototype.addProject = function() {
-      var name;
+      var name, project;
       name = this.$('input[name="new_project_name"]').val();
-      return this.collection.add({
+      project = new KnitCount.Models.Project({
         id: KnitCount.generateID('projects'),
         name: name
       });
+      this.collection.add(project);
+      return project.save();
     };
 
     ProjectListView.prototype.deleteProject = function(e) {

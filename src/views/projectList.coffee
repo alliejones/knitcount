@@ -16,10 +16,12 @@ class KnitCount.Views.ProjectListView extends KnitCount.CollectionView
 
   addProject: =>
     name = this.$('input[name="new_project_name"]').val()
-    @collection.add(
+    project = new KnitCount.Models.Project(
       id: KnitCount.generateID('projects')
       name: name
     )
+    @collection.add project
+    project.save()
 
   deleteProject: (e) =>
     id = $(e.target).closest('button').prev('a').data('id')

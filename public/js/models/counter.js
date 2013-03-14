@@ -31,18 +31,20 @@
       maxValue = this.get('max_value');
       if ((maxValue != null) && newValue > maxValue) {
         this.set('value', 1);
-        return KnitCount.dispatcher.trigger('counter:rollover', this);
+        KnitCount.dispatcher.trigger('counter:rollover', this);
       } else {
-        return this.set('value', newValue);
+        this.set('value', newValue);
       }
+      return this.save();
     };
 
     Counter.prototype.decrement = function() {
       var value;
       value = this.get('value') - 1;
       if (value >= 0) {
-        return this.set('value', value);
+        this.set('value', value);
       }
+      return this.save();
     };
 
     Counter.prototype.linkedCounterUpdate = function(updatedCounter) {
@@ -65,46 +67,7 @@
 
     Counters.prototype.model = KnitCount.Models.Counter;
 
-    Counters.prototype.sync = function(method, model, options) {
-      if (method === 'read') {
-        return this.reset([
-          {
-            id: 1,
-            name: 'Counter One',
-            value: 6,
-            project_id: 1
-          }, {
-            id: 2,
-            name: 'Counter Two',
-            value: 0,
-            project_id: 1
-          }, {
-            id: 3,
-            name: 'Counter Three',
-            value: 0,
-            project_id: 2
-          }, {
-            id: 4,
-            name: 'Counter Four',
-            value: 1,
-            project_id: 3
-          }, {
-            id: 5,
-            name: 'Linked to One',
-            value: 2,
-            project_id: 1,
-            linked_counter_id: 1
-          }, {
-            id: 6,
-            name: 'Linked to Two',
-            value: 2,
-            project_id: 1,
-            max_value: 2,
-            linked_counter_id: 2
-          }
-        ]);
-      }
-    };
+    Counters.prototype.localStorage = new Backbone.LocalStorage("Counters");
 
     return Counters;
 

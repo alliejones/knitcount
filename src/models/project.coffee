@@ -16,16 +16,4 @@ class KnitCount.Models.Project extends Backbone.Model
 
 class KnitCount.Collections.Projects extends Backbone.Collection
   model: KnitCount.Models.Project
-
-  sync: (method, model, options) ->
-    if method == 'read'
-      @reset([
-        id: 1
-        name: 'Project One'
-      ,
-        id: 2
-        name: 'Project Two'
-      ,
-        id: 3
-        name: 'Project Three'
-      ])
+  localStorage: new Backbone.LocalStorage "Projects"

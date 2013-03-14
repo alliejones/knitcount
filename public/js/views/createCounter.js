@@ -76,7 +76,8 @@
         max_value: maxValue > 0 ? +maxValue : null,
         linked_counter_id: linked_counter_id !== "" ? +linked_counter_id : null
       });
-      return KnitCount.counters.add(this.model);
+      KnitCount.counters.add(this.model);
+      return this.model.save();
     };
 
     CreateCounterView.prototype.templateData = function() {

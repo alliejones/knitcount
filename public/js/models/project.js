@@ -50,22 +50,7 @@
 
     Projects.prototype.model = KnitCount.Models.Project;
 
-    Projects.prototype.sync = function(method, model, options) {
-      if (method === 'read') {
-        return this.reset([
-          {
-            id: 1,
-            name: 'Project One'
-          }, {
-            id: 2,
-            name: 'Project Two'
-          }, {
-            id: 3,
-            name: 'Project Three'
-          }
-        ]);
-      }
-    };
+    Projects.prototype.localStorage = new Backbone.LocalStorage("Projects");
 
     return Projects;
 
