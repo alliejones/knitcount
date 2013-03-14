@@ -9,6 +9,7 @@ module.exports = function(grunt) {
       packages: {
         'jquery': '~1.8',
         'underscore': '',
+        'modernizr': '',
         'backbone': '',
         'backbone.localStorage': '',
         'handlebars': ''
