@@ -3,11 +3,17 @@ class KnitCount.Views.ProjectListView extends KnitCount.CollectionView
   className: 'project_list'
   templateName: 'projectList'
 
-  events:
+  eventsNoTouch:
     'click .add_project': 'addProject'
     'click .project a': 'goToProject'
     'click .edit': 'toggleEditMode'
     'click .delete_project': 'deleteProject'
+
+  eventsTouch:
+    'touchstart .add_project': 'addProject'
+    'touchstart .project a': 'goToProject'
+    'touchstart .edit': 'toggleEditMode'
+    'touchstart .delete_project': 'deleteProject'
 
   initialize: ->
     super

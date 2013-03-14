@@ -2,10 +2,15 @@ class KnitCount.Views.ProjectView extends KnitCount.View
   className: 'project'
   templateName: 'project'
 
-  events:
+  eventsNoTouch:
     'click .back': 'goToProjectList'
     'click .show_add_counter': 'goToAddCounter'
     'click .edit': 'toggleEditMode'
+
+  eventsTouch:
+    'touchstart .back': 'goToProjectList'
+    'touchstart .show_add_counter': 'goToAddCounter'
+    'touchstart .edit': 'toggleEditMode'
 
   initialize: (settings) =>
     super

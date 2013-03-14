@@ -22,11 +22,18 @@
 
     ProjectListView.prototype.templateName = 'projectList';
 
-    ProjectListView.prototype.events = {
+    ProjectListView.prototype.eventsNoTouch = {
       'click .add_project': 'addProject',
       'click .project a': 'goToProject',
       'click .edit': 'toggleEditMode',
       'click .delete_project': 'deleteProject'
+    };
+
+    ProjectListView.prototype.eventsTouch = {
+      'touchstart .add_project': 'addProject',
+      'touchstart .project a': 'goToProject',
+      'touchstart .edit': 'toggleEditMode',
+      'touchstart .delete_project': 'deleteProject'
     };
 
     ProjectListView.prototype.initialize = function() {

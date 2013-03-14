@@ -21,10 +21,16 @@
 
     ProjectView.prototype.templateName = 'project';
 
-    ProjectView.prototype.events = {
+    ProjectView.prototype.eventsNoTouch = {
       'click .back': 'goToProjectList',
       'click .show_add_counter': 'goToAddCounter',
       'click .edit': 'toggleEditMode'
+    };
+
+    ProjectView.prototype.eventsTouch = {
+      'touchstart .back': 'goToProjectList',
+      'touchstart .show_add_counter': 'goToAddCounter',
+      'touchstart .edit': 'toggleEditMode'
     };
 
     ProjectView.prototype.initialize = function(settings) {

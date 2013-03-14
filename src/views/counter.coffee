@@ -3,10 +3,15 @@ class KnitCount.Views.Counter extends KnitCount.View
   className: 'row'
   templateName: 'counter'
 
-  events:
+  eventsNoTouch:
     'click .increment': 'increment'
     'click .decrement': 'decrement'
     'click .delete': 'delete'
+
+  eventsTouch:
+    'touchstart .increment': 'increment'
+    'touchstart .decrement': 'decrement'
+    'touchstart .delete': 'delete'
 
   initialize: (settings) =>
     super

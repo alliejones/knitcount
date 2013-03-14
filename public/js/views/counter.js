@@ -22,10 +22,16 @@
 
     Counter.prototype.templateName = 'counter';
 
-    Counter.prototype.events = {
+    Counter.prototype.eventsNoTouch = {
       'click .increment': 'increment',
       'click .decrement': 'decrement',
       'click .delete': 'delete'
+    };
+
+    Counter.prototype.eventsTouch = {
+      'touchstart .increment': 'increment',
+      'touchstart .decrement': 'decrement',
+      'touchstart .delete': 'delete'
     };
 
     Counter.prototype.initialize = function(settings) {

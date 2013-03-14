@@ -26,9 +26,17 @@
       return this.unlinkedCounters = settings.unlinked_counters;
     };
 
-    CreateCounterView.prototype.events = {
+    CreateCounterView.prototype.eventsAll = {
       'change input[name="use_max_value"]': 'toggleUseMaxValue',
-      'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter',
+      'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter'
+    };
+
+    CreateCounterView.prototype.eventsTouch = {
+      'touchstart .add_counter': 'addCounter',
+      'touchstart .add_counter_cancel': 'goToProject'
+    };
+
+    CreateCounterView.prototype.eventsNoTouch = {
       'click .add_counter': 'addCounter',
       'click .add_counter_cancel': 'goToProject'
     };

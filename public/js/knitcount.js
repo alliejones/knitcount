@@ -57,6 +57,20 @@
       }
     };
 
+    View.prototype.eventsAll = {};
+
+    View.prototype.eventsTouch = {};
+
+    View.prototype.eventsNoTouch = {};
+
+    View.prototype.events = function() {
+      if (Modernizr.touch) {
+        return _.extend(this.eventsAll, this.eventsTouch);
+      } else {
+        return _.extend(this.eventsAll, this.eventsNoTouch);
+      }
+    };
+
     View.prototype.templateData = function() {
       return this.model.toJSON();
     };

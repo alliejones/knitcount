@@ -57,6 +57,20 @@
       }
     };
 
+    View.prototype.eventsAll = {};
+
+    View.prototype.eventsTouch = {};
+
+    View.prototype.eventsNoTouch = {};
+
+    View.prototype.events = function() {
+      if (Modernizr.touch) {
+        return _.extend(this.eventsAll, this.eventsTouch);
+      } else {
+        return _.extend(this.eventsAll, this.eventsNoTouch);
+      }
+    };
+
     View.prototype.templateData = function() {
       return this.model.toJSON();
     };
@@ -412,10 +426,16 @@
 
     Counter.prototype.templateName = 'counter';
 
-    Counter.prototype.events = {
+    Counter.prototype.eventsNoTouch = {
       'click .increment': 'increment',
       'click .decrement': 'decrement',
       'click .delete': 'delete'
+    };
+
+    Counter.prototype.eventsTouch = {
+      'touchstart .increment': 'increment',
+      'touchstart .decrement': 'decrement',
+      'touchstart .delete': 'delete'
     };
 
     Counter.prototype.initialize = function(settings) {
@@ -477,9 +497,17 @@
       return this.unlinkedCounters = settings.unlinked_counters;
     };
 
-    CreateCounterView.prototype.events = {
+    CreateCounterView.prototype.eventsAll = {
       'change input[name="use_max_value"]': 'toggleUseMaxValue',
-      'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter',
+      'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter'
+    };
+
+    CreateCounterView.prototype.eventsTouch = {
+      'touchstart .add_counter': 'addCounter',
+      'touchstart .add_counter_cancel': 'goToProject'
+    };
+
+    CreateCounterView.prototype.eventsNoTouch = {
       'click .add_counter': 'addCounter',
       'click .add_counter_cancel': 'goToProject'
     };
@@ -568,10 +596,16 @@
 
     ProjectView.prototype.templateName = 'project';
 
-    ProjectView.prototype.events = {
+    ProjectView.prototype.eventsNoTouch = {
       'click .back': 'goToProjectList',
       'click .show_add_counter': 'goToAddCounter',
       'click .edit': 'toggleEditMode'
+    };
+
+    ProjectView.prototype.eventsTouch = {
+      'touchstart .back': 'goToProjectList',
+      'touchstart .show_add_counter': 'goToAddCounter',
+      'touchstart .edit': 'toggleEditMode'
     };
 
     ProjectView.prototype.initialize = function(settings) {
@@ -665,11 +699,18 @@
 
     ProjectListView.prototype.templateName = 'projectList';
 
-    ProjectListView.prototype.events = {
+    ProjectListView.prototype.eventsNoTouch = {
       'click .add_project': 'addProject',
       'click .project a': 'goToProject',
       'click .edit': 'toggleEditMode',
       'click .delete_project': 'deleteProject'
+    };
+
+    ProjectListView.prototype.eventsTouch = {
+      'touchstart .add_project': 'addProject',
+      'touchstart .project a': 'goToProject',
+      'touchstart .edit': 'toggleEditMode',
+      'touchstart .delete_project': 'deleteProject'
     };
 
     ProjectListView.prototype.initialize = function() {

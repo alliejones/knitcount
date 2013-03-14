@@ -6,9 +6,15 @@ class KnitCount.Views.CreateCounterView extends KnitCount.View
     super
     @unlinkedCounters = settings.unlinked_counters
 
-  events:
+  eventsAll:
     'change input[name="use_max_value"]': 'toggleUseMaxValue'
     'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter'
+
+  eventsTouch:
+    'touchstart .add_counter': 'addCounter'
+    'touchstart .add_counter_cancel': 'goToProject'
+
+  eventsNoTouch:
     'click .add_counter': 'addCounter'
     'click .add_counter_cancel': 'goToProject'
 
