@@ -31,7 +31,7 @@
 
     ProjectListView.prototype.eventsTouch = {
       'touchstart .add_project': 'addProject',
-      'touchstart .project a': 'goToProject',
+      'touchend .project a': 'goToProject',
       'touchstart .edit': 'toggleEditMode',
       'touchstart .delete_project': 'deleteProject'
     };

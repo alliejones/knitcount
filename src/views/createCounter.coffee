@@ -11,8 +11,8 @@ class KnitCount.Views.CreateCounterView extends KnitCount.View
     'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter'
 
   eventsTouch:
-    'touchstart .add_counter': 'addCounter'
-    'touchstart .add_counter_cancel': 'goToProject'
+    'touchend .add_counter': 'addCounter'
+    'touchend .add_counter_cancel': 'goToProject'
 
   eventsNoTouch:
     'click .add_counter': 'addCounter'

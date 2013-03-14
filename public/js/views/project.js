@@ -28,8 +28,8 @@
     };
 
     ProjectView.prototype.eventsTouch = {
-      'touchstart .back': 'goToProjectList',
-      'touchstart .show_add_counter': 'goToAddCounter',
+      'touchend .back': 'goToProjectList',
+      'touchend .show_add_counter': 'goToAddCounter',
       'touchstart .edit': 'toggleEditMode'
     };
 

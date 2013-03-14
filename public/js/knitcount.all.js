@@ -498,8 +498,8 @@
     };
 
     CreateCounterView.prototype.eventsTouch = {
-      'touchstart .add_counter': 'addCounter',
-      'touchstart .add_counter_cancel': 'goToProject'
+      'touchend .add_counter': 'addCounter',
+      'touchend .add_counter_cancel': 'goToProject'
     };
 
     CreateCounterView.prototype.eventsNoTouch = {
@@ -598,8 +598,8 @@
     };
 
     ProjectView.prototype.eventsTouch = {
-      'touchstart .back': 'goToProjectList',
-      'touchstart .show_add_counter': 'goToAddCounter',
+      'touchend .back': 'goToProjectList',
+      'touchend .show_add_counter': 'goToAddCounter',
       'touchstart .edit': 'toggleEditMode'
     };
 
@@ -704,7 +704,7 @@
 
     ProjectListView.prototype.eventsTouch = {
       'touchstart .add_project': 'addProject',
-      'touchstart .project a': 'goToProject',
+      'touchend .project a': 'goToProject',
       'touchstart .edit': 'toggleEditMode',
       'touchstart .delete_project': 'deleteProject'
     };

@@ -32,8 +32,8 @@
     };
 
     CreateCounterView.prototype.eventsTouch = {
-      'touchstart .add_counter': 'addCounter',
-      'touchstart .add_counter_cancel': 'goToProject'
+      'touchend .add_counter': 'addCounter',
+      'touchend .add_counter_cancel': 'goToProject'
     };
 
     CreateCounterView.prototype.eventsNoTouch = {

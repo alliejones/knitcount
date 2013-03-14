@@ -8,8 +8,8 @@ class KnitCount.Views.ProjectView extends KnitCount.View
     'click .edit': 'toggleEditMode'
 
   eventsTouch:
-    'touchstart .back': 'goToProjectList'
-    'touchstart .show_add_counter': 'goToAddCounter'
+    'touchend .back': 'goToProjectList'
+    'touchend .show_add_counter': 'goToAddCounter'
     'touchstart .edit': 'toggleEditMode'
 
   initialize: (settings) =>
