@@ -33,15 +33,11 @@ class KnitCount.View extends Backbone.View
     @template = KnitCount.Templates[@templateName]
     @parentView = settings.parentView if settings.parentView?
 
-  eventsAll: {}
-  eventsTouch: {}
-  eventsNoTouch: {}
-
-  events: ->
+  events: =>
     if Modernizr.touch
-      _.extend(@eventsAll, @eventsTouch)
+      _.extend({}, @eventsAll, @eventsTouch)
     else
-      _.extend(@eventsAll, @eventsNoTouch)
+      _.extend({}, @eventsAll, @eventsNoTouch)
 
   templateData: => @model.toJSON()
 

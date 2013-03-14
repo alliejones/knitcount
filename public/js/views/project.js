@@ -35,6 +35,7 @@
 
     ProjectView.prototype.initialize = function(settings) {
       ProjectView.__super__.initialize.apply(this, arguments);
+      console.log(this.events());
       this.editMode = settings.editMode || false;
       this.listenTo(KnitCount.counters, 'add', this.model.updateCounters);
       this.listenTo(KnitCount.counters, 'remove', this.model.updateCounters);

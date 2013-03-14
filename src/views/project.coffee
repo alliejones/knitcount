@@ -15,6 +15,8 @@ class KnitCount.Views.ProjectView extends KnitCount.View
   initialize: (settings) =>
     super
 
+    console.log(@events())
+
     @editMode = settings.editMode || false
 
     @listenTo KnitCount.counters, 'add', @model.updateCounters

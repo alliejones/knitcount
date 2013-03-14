@@ -47,6 +47,7 @@
     function View() {
       this.render = __bind(this.render, this);
       this.templateData = __bind(this.templateData, this);
+      this.events = __bind(this.events, this);
       View.__super__.constructor.apply(this, arguments);
     }
 
@@ -57,17 +58,11 @@
       }
     };
 
-    View.prototype.eventsAll = {};
-
-    View.prototype.eventsTouch = {};
-
-    View.prototype.eventsNoTouch = {};
-
     View.prototype.events = function() {
       if (Modernizr.touch) {
-        return _.extend(this.eventsAll, this.eventsTouch);
+        return _.extend({}, this.eventsAll, this.eventsTouch);
       } else {
-        return _.extend(this.eventsAll, this.eventsNoTouch);
+        return _.extend({}, this.eventsAll, this.eventsNoTouch);
       }
     };
 
