@@ -9,9 +9,9 @@
     Views: {},
     init: function() {
       this.counters = new KnitCount.Collections.Counters();
-      this.counters.sync('read');
+      this.counters.fetch();
       this.projects = new KnitCount.Collections.Projects();
-      this.projects.sync('read');
+      this.projects.fetch();
       this.router = new KnitCount.Router;
       return Backbone.history.start();
     },
@@ -26,6 +26,9 @@
       allModels = KnitCount[allModelsName];
       if (allModels == null) {
         return null;
+      }
+      if (allModels.length === 0) {
+        return 1;
       }
       return (allModels.max(function(m) {
         return m.id;
@@ -51,6 +54,20 @@
       this.template = KnitCount.Templates[this.templateName];
       if (settings.parentView != null) {
         return this.parentView = settings.parentView;
+      }
+    };
+
+    View.prototype.eventsAll = {};
+
+    View.prototype.eventsTouch = {};
+
+    View.prototype.eventsNoTouch = {};
+
+    View.prototype.events = function() {
+      if (Modernizr.touch) {
+        return _.extend(this.eventsAll, this.eventsTouch);
+      } else {
+        return _.extend(this.eventsAll, this.eventsNoTouch);
       }
     };
 
@@ -185,18 +202,20 @@
       maxValue = this.get('max_value');
       if ((maxValue != null) && newValue > maxValue) {
         this.set('value', 1);
-        return KnitCount.dispatcher.trigger('counter:rollover', this);
+        KnitCount.dispatcher.trigger('counter:rollover', this);
       } else {
-        return this.set('value', newValue);
+        this.set('value', newValue);
       }
+      return this.save();
     };
 
     Counter.prototype.decrement = function() {
       var value;
       value = this.get('value') - 1;
       if (value >= 0) {
-        return this.set('value', value);
+        this.set('value', value);
       }
+      return this.save();
     };
 
     Counter.prototype.linkedCounterUpdate = function(updatedCounter) {
@@ -219,46 +238,7 @@
 
     Counters.prototype.model = KnitCount.Models.Counter;
 
-    Counters.prototype.sync = function(method, model, options) {
-      if (method === 'read') {
-        return this.reset([
-          {
-            id: 1,
-            name: 'Counter One',
-            value: 6,
-            project_id: 1
-          }, {
-            id: 2,
-            name: 'Counter Two',
-            value: 0,
-            project_id: 1
-          }, {
-            id: 3,
-            name: 'Counter Three',
-            value: 0,
-            project_id: 2
-          }, {
-            id: 4,
-            name: 'Counter Four',
-            value: 1,
-            project_id: 3
-          }, {
-            id: 5,
-            name: 'Linked to One',
-            value: 2,
-            project_id: 1,
-            linked_counter_id: 1
-          }, {
-            id: 6,
-            name: 'Linked to Two',
-            value: 2,
-            project_id: 1,
-            max_value: 2,
-            linked_counter_id: 2
-          }
-        ]);
-      }
-    };
+    Counters.prototype.localStorage = new Backbone.LocalStorage("Counters");
 
     return Counters;
 
@@ -276,6 +256,7 @@
     __extends(Project, _super);
 
     function Project() {
+      this.destroyCounters = __bind(this.destroyCounters, this);
       this.updateCounters = __bind(this.updateCounters, this);
       this.toJSON = __bind(this.toJSON, this);
       Project.__super__.constructor.apply(this, arguments);
@@ -283,7 +264,10 @@
 
     Project.prototype.initialize = function() {
       this.counters = new KnitCount.Collections.Counters;
-      return this.updateCounters();
+      this.updateCounters();
+      this.on('destroy', this.destroyCounters);
+      this.listenTo(this.counters, 'add', this.updateCounters());
+      return this.listenTo(this.counters, 'remove', this.updateCounters());
     };
 
     Project.prototype.toJSON = function() {
@@ -294,14 +278,20 @@
     };
 
     Project.prototype.updateCounters = function() {
-      var counters;
-      counters = KnitCount.counters.where({
+      this.counters.reset(KnitCount.counters.where({
         project_id: this.get('id')
-      });
-      _.each(counters, function(counter) {
+      }));
+      return this.counters.each(function(counter) {
         return counter.project = this;
       });
-      return this.counters.reset(counters);
+    };
+
+    Project.prototype.destroyCounters = function() {
+      var counters;
+      counters = _.clone(this.counters.models);
+      return _.each(counters, function(c) {
+        return c.destroy();
+      });
     };
 
     return Project;
@@ -318,22 +308,7 @@
 
     Projects.prototype.model = KnitCount.Models.Project;
 
-    Projects.prototype.sync = function(method, model, options) {
-      if (method === 'read') {
-        return this.reset([
-          {
-            id: 1,
-            name: 'Project One'
-          }, {
-            id: 2,
-            name: 'Project Two'
-          }, {
-            id: 3,
-            name: 'Project Three'
-          }
-        ]);
-      }
-    };
+    Projects.prototype.localStorage = new Backbone.LocalStorage("Projects");
 
     return Projects;
 
@@ -451,10 +426,16 @@
 
     Counter.prototype.templateName = 'counter';
 
-    Counter.prototype.events = {
+    Counter.prototype.eventsNoTouch = {
       'click .increment': 'increment',
       'click .decrement': 'decrement',
       'click .delete': 'delete'
+    };
+
+    Counter.prototype.eventsTouch = {
+      'touchstart .increment': 'increment',
+      'touchstart .decrement': 'decrement',
+      'touchstart .delete': 'delete'
     };
 
     Counter.prototype.initialize = function(settings) {
@@ -472,7 +453,7 @@
     };
 
     Counter.prototype["delete"] = function() {
-      return this.model.collection.remove(this.model);
+      return this.model.destroy();
     };
 
     Counter.prototype.templateData = function() {
@@ -516,9 +497,17 @@
       return this.unlinkedCounters = settings.unlinked_counters;
     };
 
-    CreateCounterView.prototype.events = {
+    CreateCounterView.prototype.eventsAll = {
       'change input[name="use_max_value"]': 'toggleUseMaxValue',
-      'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter',
+      'change input[name="use_linked_counter"]': 'toggleUseLinkedCounter'
+    };
+
+    CreateCounterView.prototype.eventsTouch = {
+      'touchstart .add_counter': 'addCounter',
+      'touchstart .add_counter_cancel': 'goToProject'
+    };
+
+    CreateCounterView.prototype.eventsNoTouch = {
       'click .add_counter': 'addCounter',
       'click .add_counter_cancel': 'goToProject'
     };
@@ -566,7 +555,8 @@
         max_value: maxValue > 0 ? +maxValue : null,
         linked_counter_id: linked_counter_id !== "" ? +linked_counter_id : null
       });
-      return KnitCount.counters.add(this.model);
+      KnitCount.counters.add(this.model);
+      return this.model.save();
     };
 
     CreateCounterView.prototype.templateData = function() {
@@ -598,7 +588,6 @@
       this.renderCounter = __bind(this.renderCounter, this);
       this.renderCounters = __bind(this.renderCounters, this);
       this.toggleEditMode = __bind(this.toggleEditMode, this);
-      this.deleteCounter = __bind(this.deleteCounter, this);
       this.initialize = __bind(this.initialize, this);
       ProjectView.__super__.constructor.apply(this, arguments);
     }
@@ -607,10 +596,16 @@
 
     ProjectView.prototype.templateName = 'project';
 
-    ProjectView.prototype.events = {
+    ProjectView.prototype.eventsNoTouch = {
       'click .back': 'goToProjectList',
       'click .show_add_counter': 'goToAddCounter',
       'click .edit': 'toggleEditMode'
+    };
+
+    ProjectView.prototype.eventsTouch = {
+      'touchstart .back': 'goToProjectList',
+      'touchstart .show_add_counter': 'goToAddCounter',
+      'touchstart .edit': 'toggleEditMode'
     };
 
     ProjectView.prototype.initialize = function(settings) {
@@ -623,21 +618,17 @@
     };
 
     ProjectView.prototype.goToProjectList = function() {
+      $('body').removeClass('edit_mode');
       return KnitCount.router.navigate('/', {
         trigger: true
       });
     };
 
     ProjectView.prototype.goToAddCounter = function() {
+      $('body').removeClass('edit_mode');
       return KnitCount.router.navigate("project/" + (this.model.get('id')) + "/new", {
         trigger: true
       });
-    };
-
-    ProjectView.prototype.deleteCounter = function(e) {
-      var id;
-      id = $(e.target).prev('a').data('id');
-      return KnitCount.projects.remove(KnitCount.getCounter(id));
     };
 
     ProjectView.prototype.toggleEditMode = function() {
@@ -708,11 +699,18 @@
 
     ProjectListView.prototype.templateName = 'projectList';
 
-    ProjectListView.prototype.events = {
+    ProjectListView.prototype.eventsNoTouch = {
       'click .add_project': 'addProject',
       'click .project a': 'goToProject',
       'click .edit': 'toggleEditMode',
       'click .delete_project': 'deleteProject'
+    };
+
+    ProjectListView.prototype.eventsTouch = {
+      'touchstart .add_project': 'addProject',
+      'touchstart .project a': 'goToProject',
+      'touchstart .edit': 'toggleEditMode',
+      'touchstart .delete_project': 'deleteProject'
     };
 
     ProjectListView.prototype.initialize = function() {
@@ -722,18 +720,21 @@
     };
 
     ProjectListView.prototype.addProject = function() {
-      var name;
+      var name, project;
       name = this.$('input[name="new_project_name"]').val();
-      return this.collection.add({
+      project = new KnitCount.Models.Project({
         id: KnitCount.generateID('projects'),
         name: name
       });
+      this.collection.add(project);
+      return project.save();
     };
 
     ProjectListView.prototype.deleteProject = function(e) {
-      var id;
+      var id, project;
       id = $(e.target).closest('button').prev('a').data('id');
-      return KnitCount.projects.remove(KnitCount.getProject(id));
+      project = KnitCount.getProject(id);
+      return project.destroy();
     };
 
     ProjectListView.prototype.toggleEditMode = function() {
