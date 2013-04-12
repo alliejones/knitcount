@@ -1,6 +1,6 @@
 CACHE MANIFEST
-/css/style.min.css
-/js/knitcount.min.js
-/fonts/fontawesome-webfont.eot
-/fonts/fontawesome-webfont.ttf
-/fonts/fontawesome-webfont.woff
+/knitcount/css/style.min.css
+/knitcount/js/knitcount.min.js
+/knitcount/fonts/fontawesome-webfont.eot
+/knitcount/fonts/fontawesome-webfont.ttf
+/knitcount/fonts/fontawesome-webfont.woff
