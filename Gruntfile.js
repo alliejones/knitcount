@@ -36,6 +36,7 @@ module.exports = function(grunt) {
     concat: {
       all: {
         src: [
+          'public/js/assets.js',
           'public/js/knitcount.js',
           'public/js/router.js',
           'public/js/models/*.js',
@@ -43,6 +44,14 @@ module.exports = function(grunt) {
           'public/js/templates.js'
         ],
         dest: 'public/js/knitcount.all.js',
+      }
+    },
+
+    uglify: {
+      my_target: {
+        files: {
+          'public/js/knitcount.min.js': ['public/js/knitcount.all.js']
+        }
       }
     },
 
@@ -76,6 +85,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-coffeelint');
   grunt.loadNpmTasks('grunt-contrib-handlebars');
 
